@@ -103,7 +103,20 @@ Append ALL jobs to `../../data/job-history.md` using format from `assets/templat
 | ... | ... | ... | ... | ... | ... | ... |
 ```
 
-### Step 5: Present Results
+### Step 5: Save Job Postings for Top Matches
+
+For each High-fit job, try to find and save the actual job posting:
+1. Search the company's careers page directly (e.g., `careers.company.com` or `company.com/careers`)
+2. Navigate to the specific listing and extract the full posting
+3. Save to `../../data/jobs/[company-slug]-[date]/posting.md`
+
+This ensures the posting is saved locally even if the original search link breaks later. Include:
+- The company's direct careers page URL (not the aggregator link)
+- Full job description, requirements, and qualifications
+
+If you can't find the direct posting, save what you captured from the search results.
+
+### Step 6: Present Results
 
 Show only NEW High/Medium fits not in previous history:
 
@@ -118,7 +131,15 @@ Show only NEW High/Medium fits not in previous history:
 - **Link**: [url]
 ```
 
-### Step 6: Learn from Feedback
+### Step 7: Next Steps
+
+After presenting results, tell the user:
+- To tailor a resume: `/proficiently:tailor-resume [job URL]`
+- To write a cover letter: `/proficiently:cover-letter [job URL]`
+
+**IMPORTANT**: Do NOT attempt to tailor resumes or write cover letters yourself. Those are separate skills with their own workflows. If the user asks to "build a resume" or "write a cover letter" for a job, direct them to use the appropriate skill command.
+
+### Step 8: Learn from Feedback
 
 If user provides feedback, update `../../data/preferences.md`:
 - "No agencies" → add to dealbreakers

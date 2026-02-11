@@ -54,28 +54,25 @@ If no resume is found, tell the user to either:
 
 Check if `../../data/profile.md` exists and is populated (not just the template).
 
-**If no profile exists**, extract what you can from the resume and create an initial assessment:
-
-1. Read the resume thoroughly
-2. List each role found with what you know and what's missing
-3. Present the assessment to the user:
+**If no profile exists**, STOP and warn the user clearly:
 
 ```
-I've read your resume. Here's what I understand about your background:
+I don't have a work history profile yet. Without one, I'll be working
+only from your resume text, which means:
 
-**[Company A] - [Title] ([dates])**
-- I can see: [what's clear from the resume]
-- Gaps: [what I'd need to know to tailor effectively]
+- I may get details wrong (business model, scope, responsibilities)
+- I'll have to guess at context that isn't on the resume
+- You'll likely need to correct multiple errors
 
-**[Company B] - [Title] ([dates])**
-- I can see: [what's clear from the resume]
-- Gaps: [what I'd need to know to tailor effectively]
+I strongly recommend doing a 15-20 minute work history interview first.
+This only needs to happen once, and it prevents errors on every future
+resume. Want to do that now?
 
-To create truly compelling tailored resumes, I'd recommend we do a
-work history interview so I can understand the full depth of your
-experience. This usually takes 15-20 minutes and only needs to happen
-once. Want to do that now?
+If you want to skip the interview and proceed, I'll do my best but I
+will flag every assumption I make so you can verify them.
 ```
+
+If the user chooses to proceed without an interview, set a flag to present all assumptions for verification (see Step 5a below).
 
 **If profile exists**, check for completeness:
 - Every role should have: context, responsibilities, accomplishments with metrics, key skills demonstrated, and challenges overcome
@@ -195,12 +192,22 @@ Create the tailored resume following these principles:
 - Vary sentence structure. Not every bullet should follow the exact same pattern.
 - Use natural, human language. Avoid phrases that sound like AI output.
 
+**Strict accuracy rules (CRITICAL):**
+- ONLY use information explicitly stated on the resume or in the work history profile
+- NEVER assume business model (B2B vs B2C), revenue type, or company stage unless stated
+- NEVER infer scope beyond what's written (e.g., don't add "P&L ownership" if resume says "revenue targets")
+- NEVER add responsibilities, skills, or functional areas the candidate didn't mention
+- NEVER assume cross-functional partnerships that aren't listed
+- When the resume is ambiguous, use conservative language or omit the detail entirely
+- If you need to frame experience differently for the target role, only reframe what IS there, never invent what ISN'T
+
 **What NOT to do:**
 - Don't fabricate experience or skills the candidate doesn't have
 - Don't use generic buzzwords that aren't backed by specific experience
 - Don't make the resume longer than 2 pages
 - Don't change job titles or dates
 - Don't remove roles (gaps look suspicious)
+- Don't assume anything about the candidate's business, scope, or responsibilities that isn't explicitly documented
 
 **Output:**
 
@@ -221,6 +228,22 @@ Here's your tailored resume for [Role] at [Company].
 The resume is saved to: data/jobs/[folder]/resume.md
 ```
 
+### Step 5a: Verify Assumptions (if no profile exists)
+
+If no work history profile was available, present the user with a list of every assumption made:
+
+```
+Before we finalize, here are the assumptions I made. Please correct
+any that are wrong:
+
+1. [Company] - I assumed [X]. Is that right?
+2. [Role scope] - I described your scope as [Y]. Accurate?
+3. [Business model] - I framed this as [Z]. Correct?
+...
+```
+
+Wait for the user to verify or correct before finalizing. Apply all corrections to the resume AND save them to `../../data/profile.md` so they persist.
+
 ### Step 6: Iterate
 
 Ask if the user wants to adjust anything:
@@ -230,6 +253,16 @@ Ask if the user wants to adjust anything:
 - Specific bullet points to rephrase
 
 Apply changes and re-save.
+
+### Step 7: Update Profile (ALWAYS)
+
+**Every time the user corrects a factual detail**, update `../../data/profile.md` immediately:
+- Business model corrections (e.g., "Proficiently is B2C, not B2B")
+- Scope corrections (e.g., "I had revenue targets, not P&L ownership")
+- Responsibility corrections (e.g., "I didn't manage candidate workflows")
+- Any other clarification about roles, teams, or accomplishments
+
+This prevents the same mistakes on future resumes. If the profile is still a blank template, create a new one with whatever the user has told you so far. Use the structure from `assets/templates/profile.md` but fill in only what you know for certain.
 
 ---
 

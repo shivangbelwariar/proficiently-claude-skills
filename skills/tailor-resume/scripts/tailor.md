@@ -77,6 +77,17 @@ Bullet count per role:
 - Vary sentence structure. Not every bullet should follow the exact same pattern.
 - Use natural, human language. Avoid phrases that sound like AI output.
 
+## Strict Accuracy Rules
+
+These rules are non-negotiable:
+
+- **Only use information explicitly provided** in the resume, work history profile, or user corrections. NEVER fill gaps with assumptions.
+- **Never assume business model**: Don't label a company as B2B, B2C, SaaS, marketplace, etc. unless explicitly stated. If ambiguous, describe what the company does without categorizing it.
+- **Never inflate scope**: If the resume says "revenue targets," don't write "P&L ownership." If it says "product definition," don't add "candidate management" or other functional areas.
+- **Never add cross-functional partners** not mentioned. If the resume lists "Marketing and Sales," don't add "Operations" or "Legal."
+- **When reframing, only reframe what exists**. You can reorder bullets, change wording, and mirror job posting language, but every claim must trace back to a specific fact from the source materials.
+- **If something is ambiguous, use conservative language** or omit it. Better to understate than overstate.
+
 ## Quality Checks
 
 Before returning the resume, verify:
@@ -90,6 +101,8 @@ Before returning the resume, verify:
 - [ ] Action verbs are varied (not all "Led" or "Managed")
 - [ ] Level of language matches the role's seniority
 - [ ] A hiring manager scanning for 7 seconds would see the fit
+- [ ] **Every bullet traces back to a specific fact from the resume or profile** (no invented details)
+- [ ] **Business model, scope, and responsibilities match what the candidate actually stated**
 
 ## Output Format
 
