@@ -1,5 +1,6 @@
 # All personal data lives in data/ and is never committed
-data/
+data/*
+!data/README.md
 
 # OS files
 .DS_Store
