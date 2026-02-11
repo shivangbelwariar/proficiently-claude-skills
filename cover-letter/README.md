@@ -1,0 +1,70 @@
+# Cover Letter Skill for Claude Code
+
+Write natural, persuasive cover letters tailored to specific job postings. Works alongside the [tailor-resume](../tailor-resume/) and [job-search](../job-search/) skills.
+
+## Features
+
+- **Authentic voice** - sounds like a real professional, not AI
+- **Achievement-focused** - connects 2-3 measurable results to the employer's specific needs
+- **Strict honesty** - never fabricates or exaggerates any detail from the resume
+- **Works with tailored resumes** - leverages existing match analysis when available
+
+## Prerequisites
+
+1. [Claude Code CLI](https://claude.ai/code) installed
+2. [Claude in Chrome](https://chromewebstore.google.com/detail/claude-in-chrome) extension installed
+3. Resume set up via the [job-search skill](../job-search/) (`/job-search setup`)
+4. (Recommended) Work history profile via [tailor-resume skill](../tailor-resume/) (`/tailor-resume interview`)
+
+## Setup
+
+Add to `~/.claude/settings.json`:
+
+```json
+{
+  "permissions": {
+    "allow": [
+      "Read(~/.claude/skills/cover-letter/**)",
+      "Write(~/.claude/skills/cover-letter/assets/**)",
+      "Edit(~/.claude/skills/cover-letter/assets/**)",
+      "Read(~/.claude/skills/job-search/assets/resume/**)",
+      "Read(~/.claude/skills/tailor-resume/assets/**)",
+      "mcp__claude-in-chrome__*"
+    ]
+  }
+}
+```
+
+## Usage
+
+### Write a cover letter for a job
+
+```bash
+claude "/cover-letter https://example.com/jobs/vp-growth"
+```
+
+### Use the most recent tailored resume
+
+```bash
+claude "/cover-letter last"
+```
+
+### General flow
+
+```bash
+claude "/cover-letter"
+```
+
+## How It Works
+
+1. Reads your resume and work history profile
+2. Gets the job posting (from URL or most recent tailored resume)
+3. Identifies 2-3 achievements that directly address the employer's needs
+4. Writes a 250-350 word cover letter in a natural, conversational tone
+5. Saves to `assets/cover-letters/` for your review
+
+## Tips
+
+- Run `/tailor-resume` first, then `/cover-letter last` to get a cover letter that matches your tailored resume
+- The work history interview makes cover letters significantly better since there's more material to draw from
+- Every claim in the cover letter is verified against your actual resume and work history
