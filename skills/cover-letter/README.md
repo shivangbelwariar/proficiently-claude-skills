@@ -13,8 +13,7 @@ Write natural, persuasive cover letters tailored to specific job postings. Works
 
 1. [Claude Code CLI](https://claude.ai/code) installed
 2. [Claude in Chrome](https://chromewebstore.google.com/detail/claude-in-chrome) extension installed
-3. Resume set up via the [job-search skill](../job-search/) (`/job-search setup`)
-4. (Recommended) Work history profile via [tailor-resume skill](../tailor-resume/) (`/tailor-resume interview`)
+3. Resume and profile set up via `/proficiently:setup`
 
 ## Setup
 

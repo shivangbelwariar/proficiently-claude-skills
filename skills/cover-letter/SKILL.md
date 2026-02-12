@@ -37,14 +37,14 @@ Shared data (all skills read/write here):
 
 ## Workflow
 
-### Step 0: Load Context
+### Step 0: Check Prerequisites
 
-Read:
-- `../../data/resume/*` (original resume)
-- `../../data/profile.md` (work history, if it exists)
+Check that the required data files exist:
+- `../../data/resume/*` - at least one resume file (besides README.md)
 
-If no resume found, tell user to run `/proficiently:job-search setup`.
-If no work history profile, warn that the cover letter will be based only on the resume (recommend running `/proficiently:tailor-resume interview` first for better results).
+If the resume is missing, tell the user: "Run `/proficiently:setup` first." Then stop.
+
+Check `../../data/profile.md` - if missing or just a template, warn that the cover letter will be based only on the resume (recommend running `/proficiently:setup interview` first for better results), but proceed.
 
 ### Step 1: Get Job Details
 

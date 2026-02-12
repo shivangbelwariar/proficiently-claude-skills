@@ -8,8 +8,8 @@ All personal data lives here. Everything in this directory (except this README) 
 data/
 ├── README.md            # This file (committed)
 ├── resume/              # Your resume PDF or DOCX
-├── profile.md           # Detailed work history (built via /tailor-resume interview)
-├── preferences.md       # Job matching rules (built via /job-search setup)
+├── profile.md           # Detailed work history (built via /proficiently:setup interview)
+├── preferences.md       # Job matching rules (built via /proficiently:setup)
 ├── job-history.md       # Running log of all jobs found by /job-search
 ├── jobs/                # One folder per job application
 │   ├── google-lead-gpm-2026-02-11/
@@ -24,9 +24,9 @@ data/
 
 | File | Created by | Command |
 |------|-----------|---------|
-| `resume/` | You (manually) | Place your resume here, or run `/job-search setup` |
-| `preferences.md` | `/job-search setup` | Interactive preference configuration |
-| `profile.md` | `/tailor-resume interview` | 15-20 min work history deep-dive |
+| `resume/` | `/proficiently:setup` | Place your resume here, or run setup |
+| `preferences.md` | `/proficiently:setup` | Interactive preference configuration |
+| `profile.md` | `/proficiently:setup interview` | 15-20 min work history deep-dive |
 | `job-history.md` | `/job-search` | Appended automatically after each search |
 | `jobs/[slug]/posting.md` | `/tailor-resume` | Saved when fetching a job posting |
 | `jobs/[slug]/resume.md` | `/tailor-resume` | Generated tailored resume |
@@ -35,5 +35,4 @@ data/
 ## Getting started
 
 1. Add your resume: `cp ~/your-resume.pdf ~/.claude/skills/data/resume/`
-2. Set up preferences: `claude "/job-search setup"`
-3. (Recommended) Build your work history: `claude "/tailor-resume interview"`
+2. Run setup: `claude "/proficiently:setup"` (configures preferences and builds work history)

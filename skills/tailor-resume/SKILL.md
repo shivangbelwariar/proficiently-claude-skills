@@ -1,7 +1,7 @@
 ---
 name: tailor-resume
 description: Tailor your resume for a specific job posting
-argument-hint: "job URL, or 'interview' to build work history"
+argument-hint: "job URL"
 ---
 
 # Resume Tailoring Skill
@@ -10,15 +10,13 @@ Create compelling, tailored resumes that make it obvious you're the right candid
 
 ## Quick Start
 
-- `/proficiently:tailor-resume` - Start the flow (will check work history, then ask for a job URL)
-- `/proficiently:tailor-resume interview` - Deep-dive interview to build your work history profile
+- `/proficiently:tailor-resume` - Start the flow (will ask for a job URL)
 - `/proficiently:tailor-resume https://...` - Tailor resume for a specific job posting
 
 ## File Structure
 
 ```
 scripts/
-  interview.md            # Deep-dive interview subagent prompt
   tailor.md               # Resume tailoring subagent prompt
 assets/
   templates/
@@ -42,83 +40,31 @@ Shared data (all skills read/write here):
 
 ## Workflow
 
-### Step 0: Load Resume
+### Step 0: Check Prerequisites
 
-Read the candidate's resume from `../../data/resume/*`.
+Check that the required data files exist:
+- `../../data/resume/*` - at least one resume file (besides README.md)
+- `../../data/profile.md` - populated with real content (not just a template)
 
-If no resume is found, tell the user to either:
-- Place a resume in `../../data/resume/`
-- Or run `/proficiently:job-search setup`
+If the resume is missing, tell the user: "Run `/proficiently:setup` first." Then stop.
 
-### Step 1: Assess Work History Completeness
-
-Check if `../../data/profile.md` exists and is populated (not just the template).
-
-**If no profile exists**, STOP and warn the user clearly:
+If the profile is missing, warn the user clearly:
 
 ```
 I don't have a work history profile yet. Without one, I'll be working
-only from your resume text, which means:
+only from your resume text, which means I may get details wrong and
+you'll need to correct multiple assumptions.
 
-- I may get details wrong (business model, scope, responsibilities)
-- I'll have to guess at context that isn't on the resume
-- You'll likely need to correct multiple errors
-
-I strongly recommend doing a 15-20 minute work history interview first.
-This only needs to happen once, and it prevents errors on every future
-resume. Want to do that now?
-
-If you want to skip the interview and proceed, I'll do my best but I
-will flag every assumption I make so you can verify them.
+I strongly recommend running /proficiently:setup interview first.
+This only needs to happen once, and it prevents errors on every future resume.
 ```
 
-If the user chooses to proceed without an interview, set a flag to present all assumptions for verification (see Step 5a below).
+If the user chooses to proceed without a profile, set a flag to present all assumptions for verification (see Step 3a below).
 
-**If profile exists**, check for completeness:
-- Every role should have: context, responsibilities, accomplishments with metrics, key skills demonstrated, and challenges overcome
-- If any role is thin, note it and offer to fill gaps
+If `$ARGUMENTS` is a URL, continue to Step 1.
+Otherwise, ask for a job URL.
 
-If `$ARGUMENTS` is "interview", go to Step 2 regardless.
-If `$ARGUMENTS` is a URL, skip to Step 3 (but warn if no profile exists).
-Otherwise, ask what the user wants to do.
-
-### Step 2: Work History Interview
-
-Conduct a thorough, conversational interview to build a comprehensive work history profile. Reference `scripts/interview.md` for the interview framework.
-
-**Interview approach:**
-
-Work through each role on the resume, starting with the most recent. For each role:
-
-1. **Context**: "Tell me about [Company]. What did they do, what stage were they at, what was the team like when you joined?"
-
-2. **Your mandate**: "What were you hired to do? What was the state of things when you arrived?"
-
-3. **What you built/changed**: "Walk me through the biggest things you accomplished. What did you actually do day-to-day vs. strategically?"
-
-4. **Metrics and impact**: "Let's get specific about numbers. Revenue impact? Team size? Growth rates? User numbers? Anything you can quantify."
-
-5. **How you did it**: "What was your approach? Any frameworks or methodologies? What tools or processes did you introduce?"
-
-6. **Leadership**: "Who reported to you? How did you grow the team? Any cross-functional work?"
-
-7. **Challenges**: "What was the hardest part? What didn't work? How did you adapt?"
-
-8. **Why you left**: "What prompted the move? What were you looking for next?"
-
-**Interview style:**
-- Be conversational, not interrogative
-- Ask follow-up questions when answers are vague ("Can you give me a specific example?")
-- Push for metrics ("Do you remember roughly what the numbers were?")
-- Note transferable patterns across roles
-- Listen for themes (growth, leadership, turnarounds, scaling)
-- If the candidate says "I don't remember exactly," ask for ranges or approximations
-
-**After the interview:**
-
-Save the comprehensive profile to `../../data/profile.md` using the structure in `assets/templates/profile.md`. This profile should contain significantly MORE detail than would ever appear on a resume - it's the raw material for tailoring.
-
-### Step 3: Get Job Details
+### Step 1: Get Job Details
 
 Accept a job URL from the user (from `$ARGUMENTS` or by asking).
 
@@ -145,7 +91,7 @@ Parse and extract:
 
 If the page can't be loaded or parsed, ask the user to paste the job description directly.
 
-### Step 4: Analyze Match
+### Step 2: Analyze Match
 
 Before writing, map the candidate's experience to the job:
 
@@ -162,7 +108,7 @@ Before writing, map the candidate's experience to the job:
 
 5. **Compelling narrative**: Determine the 2-3 sentence story of why this person is the obvious choice. What's the throughline?
 
-### Step 5: Generate Tailored Resume
+### Step 3: Generate Tailored Resume
 
 Create the tailored resume following these principles:
 
@@ -228,7 +174,7 @@ Here's your tailored resume for [Role] at [Company].
 The resume is saved to: data/jobs/[folder]/resume.md
 ```
 
-### Step 5a: Verify Assumptions (if no profile exists)
+### Step 3a: Verify Assumptions (if no profile exists)
 
 If no work history profile was available, present the user with a list of every assumption made:
 
@@ -244,7 +190,7 @@ any that are wrong:
 
 Wait for the user to verify or correct before finalizing. Apply all corrections to the resume AND save them to `../../data/profile.md` so they persist.
 
-### Step 6: Iterate
+### Step 4: Iterate
 
 Ask if the user wants to adjust anything:
 - Tone (more technical, more strategic, more metrics-heavy)
@@ -254,7 +200,7 @@ Ask if the user wants to adjust anything:
 
 Apply changes and re-save.
 
-### Step 7: Update Profile (ALWAYS)
+### Step 5: Update Profile (ALWAYS)
 
 **Every time the user corrects a factual detail**, update `../../data/profile.md` immediately:
 - Business model corrections (e.g., "Proficiently is B2C, not B2B")

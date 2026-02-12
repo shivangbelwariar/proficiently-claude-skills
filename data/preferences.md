@@ -1,7 +1,7 @@
 # Job Preferences
 
 These rules are used by `/job-search` to filter results and by `/tailor-resume` for context.
-Run `/job-search setup` to fill this in interactively, or edit directly.
+Run `/proficiently:setup` to fill this in interactively, or edit directly.
 
 ---
 

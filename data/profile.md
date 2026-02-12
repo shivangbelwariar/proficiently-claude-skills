@@ -1,6 +1,6 @@
 # Work History Profile
 
-Comprehensive work history built from a `/tailor-resume interview` session.
+Comprehensive work history built from a `/proficiently:setup interview` session.
 This is the raw material for tailoring resumes and writing cover letters.
 The interview takes about 15-20 minutes and only needs to happen once.
 

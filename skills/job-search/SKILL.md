@@ -1,7 +1,7 @@
 ---
 name: job-search
 description: Search hiring.cafe for jobs matching my resume and preferences
-argument-hint: "keyword to search, or 'setup' to configure"
+argument-hint: "keyword to search"
 ---
 
 # Job Search Skill
@@ -11,7 +11,6 @@ Automated daily job search using browser automation.
 ## Quick Start
 
 - `/proficiently:job-search` - Run daily search with default terms from matching rules
-- `/proficiently:job-search setup` - Configure preferences, resume, and cron schedule
 - `/proficiently:job-search AI infrastructure` - Search with specific keywords
 
 ## File Structure
@@ -37,24 +36,13 @@ Shared data (all skills read/write here):
 
 ## Workflow
 
-### Step 0: Setup Check
+### Step 0: Check Prerequisites
 
-If `$ARGUMENTS` equals "setup" OR if `../../data/preferences.md` does not exist or contains only template placeholders:
+Check that the required data files exist:
+- `../../data/resume/*` - at least one resume file (besides README.md)
+- `../../data/preferences.md` - populated with real content (not just a template)
 
-1. **Resume**: Check `../../data/resume/` for resume files
-   - If missing, ask user to provide path or paste content
-   - Save to `../../data/resume/`
-
-2. **Preferences**: Ask user to fill in matching rules:
-   - Target job titles
-   - Must-have criteria (location, salary minimum)
-   - Dealbreakers (agencies, crypto, travel, etc.)
-   - Save to `../../data/preferences.md`
-
-3. **Automation**: Ask if user wants daily cron job
-   - If yes, configure: `0 9 * * * claude -p "/proficiently:job-search"`
-
-Skip to Step 1 if setup is complete.
+If either is missing, tell the user: "Run `/proficiently:setup` first to configure your resume and preferences." Then stop.
 
 ### Step 1: Load Context
 

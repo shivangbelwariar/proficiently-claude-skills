@@ -31,7 +31,7 @@ Place your resume (PDF, DOCX, or TXT) in the assets folder:
 cp /path/to/your/resume.pdf ~/.claude/skills/job-search/assets/resume/
 ```
 
-Or run `/job-search setup` and it will prompt you.
+Or run `/proficiently:setup` and it will prompt you.
 
 ### 3. Configure permissions
 
@@ -54,13 +54,10 @@ Add to `~/.claude/settings.json`:
 ### 4. Run setup
 
 ```bash
-claude "/job-search setup"
+claude "/proficiently:setup"
 ```
 
-This will:
-- Verify your resume is found
-- Ask about your job preferences
-- Optionally configure a daily cron job
+This will configure your resume, preferences, and work history profile.
 
 ## Usage
 
@@ -73,11 +70,6 @@ claude "/job-search"
 ```bash
 claude "/job-search AI infrastructure"
 claude "/job-search remote startup"
-```
-
-### Re-run setup
-```bash
-claude "/job-search setup"
 ```
 
 ### Run headless (for cron)
