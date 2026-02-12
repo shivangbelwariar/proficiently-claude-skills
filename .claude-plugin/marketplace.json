@@ -10,7 +10,10 @@
   "plugins": [
     {
       "name": "proficiently",
-      "source": ".",
+      "source": {
+        "source": "github",
+        "repo": "proficientlyjobs/proficiently-claude-skills"
+      },
       "description": "AI-powered job search, resume tailoring, and cover letter writing",
       "version": "1.0.0",
       "author": {
