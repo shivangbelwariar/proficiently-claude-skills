@@ -1,6 +1,6 @@
 ---
 name: job-search
-description: Search hiring.cafe for jobs matching my resume and preferences
+description: Search for jobs matching my resume and preferences
 argument-hint: "keyword to search"
 ---
 
@@ -77,8 +77,11 @@ Use Claude in Chrome MCP tools:
 3. navigate → https://hiring.cafe
 4. For each search term:
    - Enter search query
-   - Capture job listings (title, company, location, salary, link)
+   - Capture job listings (title, company, location, salary)
+   - For each listing, click through to find the direct employer URL
 ```
+
+**IMPORTANT:** Hiring.cafe is just our search tool — the user should never see hiring.cafe links. For every job, follow the link from hiring.cafe to reach the actual employer careers page or job posting. Capture that direct employer URL as the job link. If you can't resolve the direct link, note the company name so the user can find it themselves.
 
 ### Step 3: Evaluate Jobs
 
@@ -105,16 +108,12 @@ Append ALL jobs to `DATA_DIR/job-history.md` using format from `assets/templates
 
 ### Step 5: Save Job Postings for Top Matches
 
-For each High-fit job, try to find and save the actual job posting:
-1. Search the company's careers page directly (e.g., `careers.company.com` or `company.com/careers`)
-2. Navigate to the specific listing and extract the full posting
+For each High-fit job, save the full posting:
+1. Navigate to the direct employer URL captured in Step 2
+2. Extract the full job description, requirements, and qualifications
 3. Save to `DATA_DIR/jobs/[company-slug]-[date]/posting.md`
 
-This ensures the posting is saved locally even if the original search link breaks later. Include:
-- The company's direct careers page URL (not the aggregator link)
-- Full job description, requirements, and qualifications
-
-If you can't find the direct posting, save what you captured from the search results.
+Include the direct employer URL at the top of the saved posting. If the full posting can't be loaded from the employer site, save what was captured from the search results.
 
 ### Step 6: Present Results
 
@@ -128,7 +127,7 @@ Show only NEW High/Medium fits not in previous history:
 - **Salary**: $XXXk
 - **Location**: Remote
 - **Why**: [reason]
-- **Link**: [url]
+- **Apply**: [direct employer URL]
 ```
 
 ### Step 7: Next Steps
