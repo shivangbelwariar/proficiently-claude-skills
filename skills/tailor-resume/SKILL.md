@@ -130,10 +130,16 @@ Create the tailored resume following these principles:
 - For director roles: emphasize program ownership, team management, operational excellence, stakeholder management
 - For IC roles: emphasize hands-on execution, technical depth, individual contributions, collaboration
 
-**Style rules:**
+**Writing rules (CRITICAL — target Flesch score above 90):**
+- Write like a sharp executive, not a language model. Short sentences. Plain words.
+- Every sentence gets one idea. If a sentence has "and" connecting two unrelated clauses, split it.
 - Never use emdashes. Use commas, periods, colons, semicolons, or parentheses instead.
 - Vary sentence structure. Not every bullet should follow the exact same pattern.
-- Use natural, human language. Avoid phrases that sound like AI output.
+- No preamble clauses. Bad: "Leveraging deep expertise in marketplace dynamics, led..." Good: "Led..."
+- No stacking adjectives. Bad: "cross-functional, data-driven, customer-centric approach". Pick one.
+- No filler phrases: "demonstrating ability to", "showcasing expertise in", "with a track record of", "needed to drive", "spanning", "leveraging", "utilizing"
+- No compound noun piles: "AI-driven product opportunity identification and execution" — just say what you did
+- Summaries must be 2-3 SHORT sentences. Each sentence under 20 words. No run-on sentences connecting multiple capabilities with commas and "and".
 
 **Strict accuracy rules (CRITICAL):**
 - ONLY use information explicitly stated on the resume or in the work history profile
@@ -151,6 +157,26 @@ Create the tailored resume following these principles:
 - Don't change job titles or dates
 - Don't remove roles (gaps look suspicious)
 - Don't assume anything about the candidate's business, scope, or responsibilities that isn't explicitly documented
+
+### Step 3b: Critique and Rewrite (MANDATORY — do this before presenting)
+
+Before showing the resume to the user, review every line and fix AI-sounding writing. Go sentence by sentence and ask:
+
+1. **Is this sentence doing too much?** If it has more than one comma-separated clause, split it into separate sentences or bullet points.
+2. **Would a real person say this?** Read it out loud. If it sounds like a LinkedIn post or a ChatGPT response, rewrite it.
+3. **Is there filler?** Cut any phrase that doesn't add information. "Demonstrating ability to identify and execute on AI-driven product opportunities from ideation through production" → "Built an AI product from idea to production."
+4. **Are there stacked buzzwords?** "Cross-functional, data-driven, customer-centric leadership" → pick the one that matters for this job and give a concrete example.
+5. **Is the summary under control?** Max 3 sentences. Each under 20 words. No sentence should list more than 2 things.
+
+**Common AI patterns to kill:**
+- "I combine X with Y, Z, and the W needed to..." → Split into separate statements
+- "...demonstrating [abstract quality]" → Delete or replace with the actual result
+- "...spanning [long list]" → Pick the most relevant 1-2 items
+- "Led [action], [action], and [action] across [scope]" → One action per bullet
+- Any bullet over 2 lines is probably trying to do too much — split it
+- Gerund clauses tacked onto the end: "...delivering X while maintaining Y" → Two sentences
+
+**Test:** After rewriting, re-read the summary and first 3 bullets. If any sentence takes more than one breath to read out loud, it's too long. Shorten it.
 
 **Output:**
 
