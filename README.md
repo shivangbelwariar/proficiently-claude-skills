@@ -12,6 +12,7 @@ A Claude Code plugin for AI-powered job searching, resume tailoring, and cover l
 | [Job Search](./skills/job-search/) | `/proficiently:job-search` | Automated job search with smart filtering and network matching |
 | [Tailor Resume](./skills/tailor-resume/) | `/proficiently:tailor-resume` | Create tailored resumes for specific job postings |
 | [Cover Letter](./skills/cover-letter/) | `/proficiently:cover-letter` | Write natural, persuasive cover letters |
+| [Network Scan](./skills/network-scan/) | `/proficiently:network-scan` | Scan your contacts' companies for matching job openings |
 
 ## How They Work Together
 
@@ -19,6 +20,7 @@ A Claude Code plugin for AI-powered job searching, resume tailoring, and cover l
 2. **`/proficiently:job-search`** finds jobs that match your preferences and resume, flags companies where you have connections
 3. **`/proficiently:tailor-resume`** rewrites your resume for a specific job posting, saves the job posting and tailored resume together
 4. **`/proficiently:cover-letter last`** writes a cover letter using the most recent job's posting and tailored resume
+5. **`/proficiently:network-scan`** scans your LinkedIn contacts' companies for matching openings (leverages your network for warm intros)
 
 All skills share a `~/.proficiently/` directory for personal files. Each job application gets its own folder containing the posting, tailored resume, and cover letter.
 
@@ -71,7 +73,10 @@ proficiently-claude-skills/
 │   │   ├── SKILL.md
 │   │   ├── assets/templates/
 │   │   └── scripts/
-│   └── cover-letter/
+│   ├── cover-letter/
+│   │   ├── SKILL.md
+│   │   └── scripts/
+│   └── network-scan/
 │       ├── SKILL.md
 │       └── scripts/
 └── README.md
@@ -85,6 +90,8 @@ proficiently-claude-skills/
 ├── preferences.md                      # Job matching rules
 ├── linkedin-contacts.csv               # LinkedIn connections (optional)
 ├── job-history.md                      # Running log from job-search
+├── company-careers.json                # Cached careers page URLs
+├── network-scan-history.md             # Running log from network-scan
 └── jobs/                               # One folder per application
     ├── google-lead-gpm-2026-02-11/
     │   ├── posting.md                  # Saved job description
