@@ -18,7 +18,8 @@ Proactively check whether companies where you know someone are hiring for roles 
 
 ```
 scripts/
-  evaluate-company.md    # Subagent for evaluating a company's open roles
+  resolve-careers.md     # Subagent for resolving a batch of company careers URLs
+  evaluate-company.md    # Subagent for scanning a batch of companies' open roles
 ```
 
 User data (stored at ~/.proficiently/):
@@ -74,30 +75,38 @@ Group contacts by company into a lookup:
 
 Report to user: "Found X unique companies from Y contacts. Checking careers pages..."
 
-### Step 2: Resolve Careers Pages
+### Step 2: Resolve Careers Pages (Parallelized)
 
 Load `~/.proficiently/company-careers.json` if it exists (the cache). If it doesn't exist, start with an empty object.
 
-For each unique company from Step 1:
+Split companies into three groups:
+- **Cached (fresh)**: `last_checked` within last 7 days - use as-is, no work needed
+- **Cached (stale)**: `last_checked` older than 7 days - needs re-verification
+- **Uncached**: not in cache, or `type` is `"not_found"` and stale - needs full resolution
 
-**If cached and `last_checked` is within the last 7 days**: use the cached entry as-is, skip resolution.
+Report: "X companies from cache, Y need resolution..."
 
-**If cached but stale (> 7 days)**: re-verify the cached URL still works. If it does, update `last_checked`. If it doesn't, re-resolve from scratch.
+**Parallel resolution using subagents:**
 
-**If not cached or `type` is `"not_found"` and stale**: resolve the careers page:
-1. Open a browser tab (Claude in Chrome MCP - use `tabs_context_mcp` then `tabs_create_mcp`)
-2. Navigate to Google and search: `"[Company Name]" careers jobs`
-3. Find the careers/jobs page from the search results
-4. Classify the URL type:
+Take all companies needing resolution (stale + uncached) and split them into batches of 10. Spawn one subagent per batch using the Task tool (`subagent_type: "general-purpose"`). Run all batches in parallel.
+
+Each subagent receives:
+- A batch of company names to resolve
+- Instructions from `scripts/resolve-careers.md`
+
+Each subagent uses `WebSearch` (NOT the browser) to find careers pages:
+1. Search: `"[Company Name]" careers jobs site:[company domain if known]`
+2. From the search results, identify the careers/jobs page URL
+3. Classify the URL type:
    - `"direct"` - company's own careers page (e.g., careers.google.com)
    - `"greenhouse"` - Greenhouse ATS (boards.greenhouse.io/company or company.greenhouse.io)
    - `"lever"` - Lever ATS (jobs.lever.co/company)
    - `"workday"` - Workday ATS (company.wd5.myworkdayjobs.com)
    - `"other_ats"` - other ATS platforms (Ashby, BambooHR, etc.)
    - `"not_found"` - no careers page could be found (set `careers_url` to null)
-5. Save the entry to the cache
+4. Return results for the batch
 
-Save `~/.proficiently/company-careers.json` after all resolutions. Format:
+Collect results from all subagents and merge into the cache. Save `~/.proficiently/company-careers.json`. Format:
 ```json
 {
   "Company Name": {
@@ -111,32 +120,42 @@ Save `~/.proficiently/company-careers.json` after all resolutions. Format:
 
 Report progress: "Resolved X new careers pages, Y from cache, Z not found."
 
-**Efficiency tips:**
-- Process companies in batches. Do not open a new tab for every company - reuse the same tab.
-- For well-known companies, you likely already know their careers URL. Use that knowledge to skip Google searches when confident.
-- If you encounter rate limiting or CAPTCHAs on Google, slow down or switch to directly navigating to likely careers URLs (e.g., `careers.{company}.com`, `{company}.com/careers`, `{company}.com/jobs`).
+### Step 3: Scan for Matching Jobs (Parallelized)
 
-### Step 3: Scan for Matching Jobs
+Take all companies with a valid `careers_url` (skip `not_found` and `ignored` entries). Split them into batches of 5 companies each.
 
-For each company with a valid `careers_url` (skip `not_found` entries):
+**Spawn parallel subagents** using the Task tool (`subagent_type: "general-purpose"`). Run all batches in parallel (up to 5 concurrent subagents to avoid overwhelming the browser).
 
-1. Navigate to the careers page in the browser
-2. Search or browse for roles matching the user's target roles and keywords from preferences
-3. For ATS pages, use the platform's search/filter functionality:
-   - **Greenhouse**: Look for a search box or department/team filters
-   - **Lever**: Use the search bar or filter by team
-   - **Workday**: Use the search field to enter keywords
-   - **Direct/other**: Browse the page, use any search functionality, or scan listed roles
-4. Extract any job listings found: title, location, URL
-5. Evaluate each listing against the candidate's resume and preferences using the fit scoring from `scripts/evaluate-company.md`:
-   - **High**: No dealbreakers + all must-haves + 2+ nice-to-haves
-   - **Medium**: No dealbreakers + most must-haves
-   - **Low**: No dealbreakers but significant gaps
-   - **Skip**: Dealbreaker present
-6. Only keep High and Medium fits
-7. Update `last_found_roles` count in the cache for this company
+Each subagent receives:
+- A batch of companies (name, careers_url, ATS type, network contacts)
+- Candidate profile summary (from resume)
+- Preferences (target roles, must-haves, dealbreakers, nice-to-haves)
+- Instructions from `scripts/evaluate-company.md`
 
-If a company's careers page fails to load or has no searchable listings, note it and move on. Do not get stuck on any single company.
+Each subagent:
+1. Creates its own browser tab (`tabs_context_mcp` then `tabs_create_mcp`)
+2. For each company in its batch:
+   a. Navigate to the careers page
+   b. Search/browse for roles matching target roles and keywords
+   c. For ATS pages, use platform search/filter functionality:
+      - **Greenhouse**: search box or department filters
+      - **Lever**: search bar or team filter
+      - **Workday**: keyword search field
+      - **Direct/other**: browse the page, use any search, scan listed roles
+   d. Extract listings: title, location, URL
+   e. Score each listing (High/Medium/Low/Skip per fit criteria)
+   f. Return only High and Medium fits
+3. Returns results for its entire batch
+
+**Fit scoring criteria** (consistent across all Proficiently skills):
+- **High**: No dealbreakers + all must-haves + 2+ nice-to-haves
+- **Medium**: No dealbreakers + most must-haves
+- **Low**: No dealbreakers but significant gaps
+- **Skip**: Dealbreaker present
+
+Collect results from all subagents. Update `last_found_roles` count in the cache for each company scanned.
+
+If a subagent fails or times out, log the companies it was processing and move on. Do not retry - the user can re-run with those companies next time.
 
 ### Step 4: Save Results
 
