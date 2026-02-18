@@ -78,42 +78,41 @@ Use Claude in Chrome MCP tools:
 4. For each search term:
    - Enter search query
    - Capture job listings (title, company, location, salary)
-   - For each listing, click through to find the direct employer URL
 ```
 
-**IMPORTANT:** Hiring.cafe is just our search tool — the user should never see hiring.cafe links. For every job, follow the link from hiring.cafe to reach the actual employer careers page or job posting. Capture that direct employer URL as the job link. If you can't resolve the direct link, note the company name so the user can find it themselves.
+**Note:** Hiring.cafe is just our search tool. Don't share hiring.cafe links with the user — you'll resolve direct employer URLs for the top matches in Step 5.
 
 ### Step 3: Evaluate Jobs
 
-Spawn the evaluation subagent with:
-- Candidate profile summary
-- Matching rules
-- Raw job listings
-
-Reference: `scripts/evaluate-jobs.md`
-
-The subagent returns scored jobs with fit ratings (High/Medium/Low/Skip).
+Score each job against the candidate's resume and preferences. For each job, assign a fit rating:
+- **High** — strong match on role, level, and preferences
+- **Medium** — partial match, worth reviewing
+- **Low** — weak match
+- **Skip** — hits a dealbreaker
 
 ### Step 4: Save History
 
-Append ALL jobs to `DATA_DIR/job-history.md` using format from `assets/templates/job-entry.md`:
+Append ALL jobs to `DATA_DIR/job-history.md`:
 
 ```markdown
 ## [DATE] - Search: "[terms]"
 
-| Job Title | Company | Location | Salary | Link | Fit | Notes |
-|-----------|---------|----------|--------|------|-----|-------|
-| ... | ... | ... | ... | ... | ... | ... |
+| Job Title | Company | Location | Salary | Fit | Notes |
+|-----------|---------|----------|--------|-----|-------|
+| ... | ... | ... | ... | ... | ... |
 ```
 
-### Step 5: Save Job Postings for Top Matches
+### Step 5: Resolve Employer URLs & Save Top Postings
 
-For each High-fit job, save the full posting:
-1. Navigate to the direct employer URL captured in Step 2
-2. Extract the full job description, requirements, and qualifications
-3. Save to `DATA_DIR/jobs/[company-slug]-[date]/posting.md`
+For each **High-fit** job:
+1. Click through the hiring.cafe listing to reach the actual employer careers page
+2. Capture the direct employer URL for the job posting
+3. Extract the full job description, requirements, and qualifications
+4. Save to `DATA_DIR/jobs/[company-slug]-[date]/posting.md` with the employer URL at the top
 
-Include the direct employer URL at the top of the saved posting. If the full posting can't be loaded from the employer site, save what was captured from the search results.
+For **Medium-fit** jobs, try to resolve the employer URL but don't save the full posting.
+
+If you can't resolve the direct link for a job, note the company name so the user can find it themselves. Never show hiring.cafe URLs to the user.
 
 ### Step 6: Present Results
 
