@@ -26,19 +26,30 @@ All skills share a `~/.proficiently/` directory for personal files. Each job app
 
 ## Installation
 
-### 1. Install the plugin
+### Option A: Claude Cowork (desktop app)
+
+1. Download [Claude Cowork](https://claude.com/product/cowork) if you haven't already
+2. Download the plugin as a zip from GitHub: [Download ZIP](https://github.com/proficientlyjobs/proficiently-claude-skills/archive/refs/heads/main.zip)
+3. In Cowork, go to **Plugins** (left sidebar) and click the **+** button
+4. Select **Upload plugin**
+5. Drag and drop the downloaded zip file, then click **Upload**
+6. Run `/proficiently:setup` to get started
+
+### Option B: Claude Code CLI
 
 ```bash
 claude plugin add https://github.com/proficientlyjobs/proficiently-claude-skills.git
 ```
 
-### 2. Run setup
+Then run setup:
 
 ```
 /proficiently:setup
 ```
 
-This will create `~/.proficiently/`, prompt you for your resume, configure your job preferences, optionally import your LinkedIn contacts, and conduct a work history interview.
+### After installing
+
+Setup will create `~/.proficiently/`, prompt you for your resume, configure your job preferences, optionally import your LinkedIn contacts, and conduct a work history interview.
 
 You can also add your resume manually first:
 
@@ -49,7 +60,7 @@ cp /path/to/your/resume.pdf ~/.proficiently/resume/
 
 ## Prerequisites
 
-- [Claude Code CLI](https://claude.ai/code)
+- [Claude Cowork](https://claude.com/product/cowork) desktop app **or** [Claude Code CLI](https://claude.ai/code)
 - [Claude in Chrome](https://chromewebstore.google.com/detail/claude-in-chrome) extension (for browser automation)
 - Chrome browser running with the extension active
 
