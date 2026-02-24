@@ -6,6 +6,8 @@ argument-hint: "keyword to search"
 
 # Job Search Skill
 
+> **Priority hierarchy**: See `shared/references/priority-hierarchy.md` for conflict resolution.
+
 Automated daily job search using browser automation.
 
 ## Quick Start
@@ -24,26 +26,7 @@ assets/
 
 ## Data Directory
 
-All user data lives in a `.proficiently/` folder. To find it:
-1. Check the current working directory for `.proficiently/` — use it if found
-2. Check `DATA_DIR/` — use it if found
-3. If neither exists, tell the user to run `/proficiently:setup` first
-
-**IMPORTANT:** If no folder is selected (i.e. the working directory looks like an ephemeral session path such as `/sessions/...`), stop and tell the user:
-
-> "Before we start, you need to select a folder so your data persists between sessions. Click 'Work in a folder' and select your home directory, then try again."
-
-All paths below use `DATA_DIR` to mean whichever `.proficiently/` directory was found.
-
-```
-DATA_DIR/
-  resume/              # Your resume PDF/DOCX
-  preferences.md       # Job matching rules
-  profile.md           # Work history from interview
-  linkedin-contacts.csv # LinkedIn connections (optional)
-  jobs/                # Per-job application folders
-  job-history.md       # Running log from job-search
-```
+Resolve the data directory using `shared/references/data-directory.md`.
 
 ---
 
@@ -51,11 +34,7 @@ DATA_DIR/
 
 ### Step 0: Check Prerequisites
 
-First, resolve the data directory using the rules above. Then check that the required data files exist:
-- `DATA_DIR/resume/*` - at least one resume file (besides README.md)
-- `DATA_DIR/preferences.md` - populated with real content (not just a template)
-
-If either is missing, tell the user: "Run `/proficiently:setup` first to configure your resume and preferences." Then stop.
+Resolve the data directory, then check prerequisites per `shared/references/prerequisites.md`. Resume and preferences are both required.
 
 ### Step 1: Load Context
 
@@ -71,26 +50,13 @@ Extract search terms from:
 
 ### Step 2: Browser Search
 
-Use Claude in Chrome MCP tools:
-
-```
-1. tabs_context_mcp → get browser state
-2. tabs_create_mcp → new tab
-3. navigate → https://hiring.cafe
-4. For each search term:
-   - Enter search query
-   - Capture job listings (title, company, location, salary)
-```
+Use Claude in Chrome MCP tools per `shared/references/browser-setup.md`, navigating to https://hiring.cafe. For each search term, enter the query and capture job listings (title, company, location, salary).
 
 **Note:** Hiring.cafe is just our search tool. Don't share hiring.cafe links with the user — you'll resolve direct employer URLs for the top matches in Step 5.
 
 ### Step 3: Evaluate Jobs
 
-Score each job against the candidate's resume and preferences. For each job, assign a fit rating:
-- **High** — strong match on role, level, and preferences
-- **Medium** — partial match, worth reviewing
-- **Low** — weak match
-- **Skip** — hits a dealbreaker
+Score each job against the candidate's resume and preferences using the criteria in `shared/references/fit-scoring.md`.
 
 ### Step 4: Save History
 
@@ -157,6 +123,15 @@ If user provides feedback, update `DATA_DIR/preferences.md`:
 - "No agencies" → add to dealbreakers
 - "Prefer AI companies" → add to nice-to-haves
 - "Minimum $350k" → update salary threshold
+
+---
+
+## Response Format
+
+Structure user-facing output with these sections:
+
+1. **Top Matches** — table or list of High/Medium fits with company, role, fit rating, salary, location, network contacts, and direct URL
+2. **Next Steps** — suggest `/proficiently:tailor-resume` and `/proficiently:cover-letter` for top matches
 
 ---
 

@@ -12,10 +12,7 @@ Use this format when appending jobs to `job-history.md`:
 
 ## Fit Score Criteria
 
-- **High**: Matches target role, meets salary minimum, location works, no dealbreakers
-- **Medium**: Partial match - missing 1-2 criteria but still worth considering
-- **Low**: Significant gaps but not a dealbreaker
-- **Skip**: Has a dealbreaker (note which one)
+See `shared/references/fit-scoring.md` for canonical definitions.
 
 ## Notes Format
 

@@ -6,6 +6,8 @@ argument-hint: "job URL"
 
 # Resume Tailoring Skill
 
+> **Priority hierarchy**: See `shared/references/priority-hierarchy.md` for conflict resolution.
+
 Create compelling, tailored resumes that make it obvious you're the right candidate for a specific job.
 
 ## Quick Start
@@ -17,33 +19,14 @@ Create compelling, tailored resumes that make it obvious you're the right candid
 
 ```
 scripts/
-  tailor.md               # Resume tailoring subagent prompt
-assets/
-  templates/
-    profile.md            # Template for work history profile
+  tailor-resume.md        # Resume tailoring subagent prompt
 ```
+
+The profile template is at `shared/templates/profile.md`.
 
 ## Data Directory
 
-All user data lives in a `.proficiently/` folder. To find it:
-1. Check the current working directory for `.proficiently/` — use it if found
-2. Check `DATA_DIR/` — use it if found
-3. If neither exists, tell the user to run `/proficiently:setup` first
-
-**IMPORTANT:** If no folder is selected (i.e. the working directory looks like an ephemeral session path such as `/sessions/...`), stop and tell the user:
-
-> "Before we start, you need to select a folder so your data persists between sessions. Click 'Work in a folder' and select your home directory, then try again."
-
-All paths below use `DATA_DIR` to mean whichever `.proficiently/` directory was found.
-
-```
-DATA_DIR/
-  resume/              # Your resume PDF/DOCX
-  preferences.md       # Job matching rules
-  profile.md           # Work history from interview
-  jobs/                # Per-job application folders
-  job-history.md       # Running log from job-search
-```
+Resolve the data directory using `shared/references/data-directory.md`.
 
 ---
 
@@ -51,24 +34,7 @@ DATA_DIR/
 
 ### Step 0: Check Prerequisites
 
-First, resolve the data directory using the rules above. Then check that the required data files exist:
-- `DATA_DIR/resume/*` - at least one resume file (besides README.md)
-- `DATA_DIR/profile.md` - populated with real content (not just a template)
-
-If the resume is missing, tell the user: "Run `/proficiently:setup` first." Then stop.
-
-If the profile is missing, warn the user clearly:
-
-```
-I don't have a work history profile yet. Without one, I'll be working
-only from your resume text, which means I may get details wrong and
-you'll need to correct multiple assumptions.
-
-I strongly recommend running /proficiently:setup interview first.
-This only needs to happen once, and it prevents errors on every future resume.
-```
-
-If the user chooses to proceed without a profile, set a flag to present all assumptions for verification (see Step 3a below).
+Resolve the data directory, then check prerequisites per `shared/references/prerequisites.md`. Resume is required; profile is strongly recommended. If the user proceeds without a profile, set a flag to present all assumptions for verification (see Step 3a below).
 
 If `$ARGUMENTS` is a URL, continue to Step 1.
 Otherwise, ask for a job URL.
@@ -77,14 +43,7 @@ Otherwise, ask for a job URL.
 
 Accept a job URL from the user (from `$ARGUMENTS` or by asking).
 
-Use Claude in Chrome MCP tools to fetch the job posting:
-
-```
-1. tabs_context_mcp → get browser state
-2. tabs_create_mcp → new tab
-3. navigate → job URL
-4. get_page_text → extract full job posting
-```
+Use Claude in Chrome MCP tools to fetch the job posting per `shared/references/browser-setup.md`.
 
 Parse and extract:
 - **Job title** and level (IC vs. manager, seniority)
@@ -250,7 +209,17 @@ in touch with hiring managers? Visit proficiently.com
 - Responsibility corrections (e.g., "I didn't manage candidate workflows")
 - Any other clarification about roles, teams, or accomplishments
 
-This prevents the same mistakes on future resumes. If the profile is still a blank template, create a new one with whatever the user has told you so far. Use the structure from `assets/templates/profile.md` but fill in only what you know for certain.
+This prevents the same mistakes on future resumes. If the profile is still a blank template, create a new one with whatever the user has told you so far. Use the structure from `shared/templates/profile.md` but fill in only what you know for certain.
+
+---
+
+## Response Format
+
+Structure user-facing output with these sections:
+
+1. **Tailored Resume** — the full resume text
+2. **Tailoring Notes** — key changes made (reordered bullets, rewritten sections, added content from profile) and the narrative pitch
+3. **What's Next** — suggest iterating on tone/emphasis, or writing a cover letter with `/proficiently:cover-letter`
 
 ---
 

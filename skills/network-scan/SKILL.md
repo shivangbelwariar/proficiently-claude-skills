@@ -6,6 +6,8 @@ argument-hint: "number of contacts (default 25) or 'all'"
 
 # Network Scan Skill
 
+> **Priority hierarchy**: See `shared/references/priority-hierarchy.md` for conflict resolution.
+
 Proactively check whether companies where you know someone are hiring for roles that match you. First run builds a cache of company careers page URLs. Subsequent runs reuse the cache, making weekly checks fast.
 
 ## Quick Start
@@ -40,19 +42,12 @@ User data (stored at ~/.proficiently/):
 
 ### Step 0: Check Prerequisites
 
-Check that the required data files exist:
-- `~/.proficiently/resume/*` - at least one resume file (besides README.md)
-- `~/.proficiently/preferences.md` - populated with real content (not just a template)
-- `~/.proficiently/linkedin-contacts.csv` - LinkedIn contacts export
-
-If resume or preferences are missing, tell the user: "Run `/proficiently:setup` first to configure your resume and preferences." Then stop.
-
-If linkedin-contacts.csv is missing, tell the user: "No LinkedIn contacts found. Run `/proficiently:setup` and import your contacts first." Then stop.
+Resolve the data directory, then check prerequisites per `shared/references/prerequisites.md`. Resume, preferences, and linkedin-contacts.csv are all required.
 
 Load these files for use in later steps:
-- `~/.proficiently/preferences.md` (target roles, must-haves, dealbreakers, nice-to-haves)
-- `~/.proficiently/resume/*` (candidate profile)
-- `~/.proficiently/profile.md` (work history, if it exists)
+- `DATA_DIR/preferences.md` (target roles, must-haves, dealbreakers, nice-to-haves)
+- `DATA_DIR/resume/*` (candidate profile)
+- `DATA_DIR/profile.md` (work history, if it exists)
 
 ### Step 1: Select Contacts & Extract Companies
 
@@ -147,11 +142,7 @@ Each subagent:
    f. Return only High and Medium fits
 3. Returns results for its entire batch
 
-**Fit scoring criteria** (consistent across all Proficiently skills):
-- **High**: No dealbreakers + all must-haves + 2+ nice-to-haves
-- **Medium**: No dealbreakers + most must-haves
-- **Low**: No dealbreakers but significant gaps
-- **Skip**: Dealbreaker present
+**Fit scoring criteria:** See `shared/references/fit-scoring.md` for the canonical definitions.
 
 Collect results from all subagents. Update `last_found_roles` count in the cache for each company scanned.
 
@@ -274,6 +265,16 @@ If the user provides feedback after seeing results:
 - **"Skip [company]"**: Add `"ignored": true` to that company's entry in company-careers.json. Future scans will skip it.
 - **Corrects a careers URL**: Update the cache entry with the correct URL and type.
 - **Adjusts preferences**: Update `~/.proficiently/preferences.md` accordingly (e.g., "add fintech to nice-to-haves", "no crypto companies").
+
+---
+
+## Response Format
+
+Structure user-facing output with these sections:
+
+1. **Network Matches** — list of High/Medium fits with company, role, fit rating, contact name, and apply URL
+2. **Companies Checked** — summary of companies with no matches and companies without careers pages
+3. **Next Steps** — suggest `/proficiently:tailor-resume` and `/proficiently:cover-letter` for top matches
 
 ---
 

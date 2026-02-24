@@ -13,35 +13,7 @@ You will receive:
 
 For each job listing:
 
-### 1. Check Dealbreakers First
-Immediately mark as "Skip" if ANY dealbreaker is present:
-- Check company type (agency, crypto, etc.)
-- Check location requirements
-- Check travel requirements
-- Check clearance requirements
-- Check minimum salary threshold
-
-### 2. Score Must-Haves
-Count how many must-have criteria are met:
-- All met = proceed to nice-to-haves
-- Most met = potential Medium fit
-- Few met = likely Low fit
-
-### 3. Score Nice-to-Haves
-For jobs passing must-haves, evaluate:
-- Company stage/funding
-- Industry alignment
-- Growth potential
-- Role scope
-
-### 4. Assign Fit Score
-
-| Score | Criteria |
-|-------|----------|
-| **High** | No dealbreakers + all must-haves + 2+ nice-to-haves |
-| **Medium** | No dealbreakers + most must-haves OR all must-haves but few nice-to-haves |
-| **Low** | No dealbreakers but significant gaps in must-haves |
-| **Skip** | Any dealbreaker present |
+Follow the evaluation process and fit scoring criteria defined in `shared/references/fit-scoring.md`.
 
 ## Output Format
 
