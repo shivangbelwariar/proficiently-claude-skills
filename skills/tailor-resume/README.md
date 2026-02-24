@@ -38,11 +38,8 @@ This will check prerequisites, then ask for a job URL.
 tailor-resume/
 ├── SKILL.md                          # Main skill definition
 ├── README.md                         # This file
-├── assets/
-│   └── templates/
-│       └── profile.md                # Work history template (committed)
 └── scripts/
-    └── tailor.md                     # Tailoring agent prompt
+    └── tailor-resume.md              # Tailoring agent prompt
 ```
 
 **User data (at `~/.proficiently/`):**

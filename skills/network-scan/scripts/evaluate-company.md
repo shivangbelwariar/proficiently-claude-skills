@@ -45,24 +45,9 @@ For each potentially matching role found, extract:
 - **url**: direct link to the job posting
 - **department**: if visible
 
-### 4. Check Dealbreakers First
+### 4. Score Each Listing
 
-Immediately mark as "Skip" if ANY dealbreaker is present:
-- Check company type against dealbreakers
-- Check location requirements
-- Check salary if visible
-- Check role level (too junior, too senior)
-
-### 5. Score Each Listing
-
-Apply the same fit scoring used across all Proficiently skills:
-
-| Score | Criteria |
-|-------|----------|
-| **High** | No dealbreakers + all must-haves + 2+ nice-to-haves |
-| **Medium** | No dealbreakers + most must-haves OR all must-haves but few nice-to-haves |
-| **Low** | No dealbreakers but significant gaps in must-haves |
-| **Skip** | Any dealbreaker present |
+Follow the evaluation process and fit scoring criteria defined in `shared/references/fit-scoring.md`. Check dealbreakers first, then score must-haves, then nice-to-haves.
 
 ## Output Format
 

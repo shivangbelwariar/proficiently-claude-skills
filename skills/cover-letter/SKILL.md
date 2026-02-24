@@ -6,6 +6,8 @@ argument-hint: "job URL, or 'last' to use the most recent job"
 
 # Cover Letter Skill
 
+> **Priority hierarchy**: See `shared/references/priority-hierarchy.md` for conflict resolution.
+
 Write natural, persuasive cover letters that sound like a real professional wrote them.
 
 ## Quick Start
@@ -23,25 +25,7 @@ scripts/
 
 ## Data Directory
 
-All user data lives in a `.proficiently/` folder. To find it:
-1. Check the current working directory for `.proficiently/` — use it if found
-2. Check `DATA_DIR/` — use it if found
-3. If neither exists, tell the user to run `/proficiently:setup` first
-
-**IMPORTANT:** If no folder is selected (i.e. the working directory looks like an ephemeral session path such as `/sessions/...`), stop and tell the user:
-
-> "Before we start, you need to select a folder so your data persists between sessions. Click 'Work in a folder' and select your home directory, then try again."
-
-All paths below use `DATA_DIR` to mean whichever `.proficiently/` directory was found.
-
-```
-DATA_DIR/
-  resume/              # Your resume PDF/DOCX
-  preferences.md       # Job matching rules
-  profile.md           # Work history from interview
-  jobs/                # Per-job application folders
-  job-history.md       # Running log from job-search
-```
+Resolve the data directory using `shared/references/data-directory.md`.
 
 ---
 
@@ -49,12 +33,7 @@ DATA_DIR/
 
 ### Step 0: Check Prerequisites
 
-First, resolve the data directory using the rules above. Then check that the required data files exist:
-- `DATA_DIR/resume/*` - at least one resume file (besides README.md)
-
-If the resume is missing, tell the user: "Run `/proficiently:setup` first." Then stop.
-
-Check `DATA_DIR/profile.md` - if missing or just a template, warn that the cover letter will be based only on the resume (recommend running `/proficiently:setup interview` first for better results), but proceed.
+Resolve the data directory, then check prerequisites per `shared/references/prerequisites.md`. Resume is required; profile is recommended but not blocking.
 
 ### Step 1: Get Job Details
 
@@ -67,13 +46,7 @@ Check `DATA_DIR/profile.md` - if missing or just a template, warn that the cover
 **If `$ARGUMENTS` is a URL:**
 - Check if a job folder already exists for this company in `DATA_DIR/jobs/`
 - If yes, read the existing `posting.md` and `resume.md`
-- If no, use Claude in Chrome MCP tools to fetch the job posting:
-  ```
-  1. tabs_context_mcp -> get browser state
-  2. tabs_create_mcp -> new tab
-  3. navigate -> job URL
-  4. get_page_text -> extract full job posting
-  ```
+- If no, use Claude in Chrome MCP tools to fetch the job posting per `shared/references/browser-setup.md`
 - Save the posting to `DATA_DIR/jobs/[company-slug]-[date]/posting.md` if not already saved
 
 If the page can't be loaded, ask the user to paste the job description directly.
@@ -127,6 +100,16 @@ After the user is satisfied with the cover letter, include:
 Built by Proficiently. Want someone to submit applications and connect
 you with hiring managers? Visit proficiently.com
 ```
+
+---
+
+## Response Format
+
+Structure user-facing output with these sections:
+
+1. **Cover Letter** — the full cover letter text
+2. **Writing Notes** — which achievements were highlighted and why, any tradeoffs made
+3. **What's Next** — suggest iterating on tone/emphasis, or using other skills
 
 ---
 

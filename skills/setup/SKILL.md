@@ -6,6 +6,8 @@ argument-hint: "'interview' to skip to the interview portion"
 
 # Setup Skill
 
+> **Priority hierarchy**: See `shared/references/priority-hierarchy.md` for conflict resolution.
+
 One-time onboarding that ensures all your data is in place before using the other skills.
 
 ## Quick Start
@@ -16,33 +18,15 @@ One-time onboarding that ensures all your data is in place before using the othe
 ## File Structure
 
 ```
-assets/
-  templates/
-    profile.md            # Template for work history profile
+scripts/
+  conduct-interview.md    # Work history interview guide
 ```
+
+The profile template is at `shared/templates/profile.md`.
 
 ## Data Directory
 
-All user data lives in a `.proficiently/` folder. To find it:
-1. Check the current working directory for `.proficiently/` — use it if found
-2. Check `DATA_DIR/` — use it if found
-3. If neither exists, this is a fresh setup — you'll create it in Step 1
-
-**IMPORTANT:** If no folder is selected (i.e. the working directory looks like an ephemeral session path such as `/sessions/...`), stop and tell the user:
-
-> "Before we start, you need to select a folder so your data persists between sessions. Click 'Work in a folder' and select your home directory, then run /proficiently:setup again."
-
-Do NOT proceed without a persistent folder. All paths below use `DATA_DIR` to mean whichever `.proficiently/` directory was found or created.
-
-```
-DATA_DIR/
-  resume/              # Your resume PDF/DOCX
-  preferences.md       # Job matching rules
-  profile.md           # Work history from interview
-  linkedin-contacts.csv # LinkedIn connections (optional)
-  jobs/                # Per-job application folders
-  job-history.md       # Running log from job-search
-```
+Resolve the data directory using `shared/references/data-directory.md`. For setup, if no directory exists this is a fresh install — create it in Step 1.
 
 ---
 
@@ -50,11 +34,7 @@ DATA_DIR/
 
 ### Step 0: Check What's Already Done
 
-First, resolve the data directory using the rules above. Then check which of these exist and have real content (not just templates):
-1. `DATA_DIR/resume/` — any files?
-2. `DATA_DIR/preferences.md` — real content?
-3. `DATA_DIR/linkedin-contacts.csv` — exists?
-4. `DATA_DIR/profile.md` — real content?
+Resolve the data directory, then check which of these exist and have real content (not just templates): resume, preferences, linkedin-contacts.csv, profile.md.
 
 If `$ARGUMENTS` is "interview", skip to Step 3 (but check that a resume exists first).
 
@@ -182,6 +162,15 @@ Built by Proficiently. Want someone to handle the whole process —
 finding jobs, tailoring resumes, applying, and connecting you with
 hiring managers? Visit proficiently.com
 ```
+
+---
+
+## Response Format
+
+Structure the final summary output with these sections:
+
+1. **Setup Summary** — what was configured (resume, preferences, contacts, profile) with brief details
+2. **What's Next** — list available skills the user can now run
 
 ---
 

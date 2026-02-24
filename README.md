@@ -71,10 +71,18 @@ cp /path/to/your/resume.pdf ~/.proficiently/resume/
 proficiently-claude-skills/
 ├── .claude-plugin/
 │   └── plugin.json                     # Plugin manifest
+├── shared/
+│   ├── templates/
+│   │   └── profile.md                  # Work history profile template
+│   └── references/
+│       ├── fit-scoring.md              # Canonical fit scoring criteria
+│       ├── data-directory.md           # Data directory resolution algorithm
+│       ├── prerequisites.md            # Prerequisites checking by skill
+│       ├── browser-setup.md            # Browser automation setup sequence
+│       └── priority-hierarchy.md       # Instruction priority hierarchy
 ├── skills/
 │   ├── setup/
 │   │   ├── SKILL.md
-│   │   ├── assets/templates/
 │   │   └── scripts/
 │   ├── job-search/
 │   │   ├── SKILL.md
@@ -82,7 +90,6 @@ proficiently-claude-skills/
 │   │   └── scripts/
 │   ├── tailor-resume/
 │   │   ├── SKILL.md
-│   │   ├── assets/templates/
 │   │   └── scripts/
 │   ├── cover-letter/
 │   │   ├── SKILL.md
