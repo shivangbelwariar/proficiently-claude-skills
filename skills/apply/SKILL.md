@@ -162,67 +162,105 @@ Prepared for [Role] at [Company]:
 Ready to fill the application. Proceeding...
 ```
 
-### Step 5: Fill Form — Adaptive Loop
+### Step 5: Scan All Fields
 
-This is the core of the skill. It works the same regardless of ATS — ATS-specific logic is only in Step 3 (navigation) and the interaction method.
+Before filling anything, scan the entire form to discover every field. Do NOT fill fields during this step — read only.
 
-**The loop:**
+**For Lever/Greenhouse (single-page forms):**
+- Call `read_page(tabId, filter="interactive")` to get all fields at once
+
+**For Workday (multi-step wizard):**
+- Scan the current page by scrolling top-to-bottom, calling `read_page` at each viewport position
+- Collect all field labels, types, and whether they're required
+- Note: you'll scan each wizard page as you reach it (see Step 7)
+
+**For each field found**, record:
+- Field label
+- Field type (text, dropdown, radio, checkbox, file upload)
+- Whether it's required
+- The element ref for later filling
+
+### Step 6: Propose Answers and Get Approval
+
+Generate a proposed answer for every field using this priority:
+1. **Application data** — match from `application-data.md` per the Field Matching Reference below
+2. **Reasonable defaults** — for common fields not in application data:
+   - Legal First/Last Name → same as First/Last Name
+   - Electronic signature → full name
+   - Arbitration/terms agreements → Accept (note to user)
+   - Interview process acknowledgments → Accept
+   - AI transcription consent → Accept
+   - Contract/temp work questions → "No" (unless application data says otherwise)
+3. **Custom Answers** — check the "Custom Answers" section of `application-data.md` for previously cached answers
+4. **Best guess** — for any remaining fields, generate a reasonable answer based on the field label and job context
+5. **Cannot determine** — only if truly ambiguous and no reasonable default exists
+
+Present ONE consolidated summary to the user:
 
 ```
-REPEAT:
-  1. Scan current view for form fields
-  2. Match field labels to application data
-  3. Fill matched fields
-  4. Scroll down to check for more fields
-  5. If more fields found → go to 2
-  6. If no more fields → attempt to advance (submit/next page)
-  7. If validation errors → read errors, fix missing fields, retry advance
-  8. If new page loaded → go to 1
-  9. If review/confirmation page → go to Step 6
-  10. If submit succeeded → go to Step 7
+Here's my plan for the [Company] application:
+
+**Auto-fill from your data:**
+- First Name: Jane
+- Last Name: Doe
+- Email: jane@example.com
+- Phone: 555-0123
+- LinkedIn: https://linkedin.com/in/janedoe
+...
+
+**Proposed answers (please review):**
+- Legal First Name: Jane (same as first name)
+- Electronic signature: Jane Doe
+- Arbitration agreement: Accept
+- Contract work: No
+- [Any other non-obvious fields]: [proposed answer]
+
+**Needs your input:**
+- [Only truly ambiguous fields, if any]
+
+**Manual upload needed:**
+- Resume: [file path]
+- Cover letter: [file path] (if applicable)
+
+Approve and I'll fill everything in. Or tell me what to change.
 ```
 
-**Delegate form filling to the subagent.** For each page/view, invoke the `scripts/fill-page.md` subagent with:
+**Key principle:** Ask once, fill once. Do not interrupt with per-field questions. The only user interaction should be this single approval (plus the final submit confirmation in Step 8).
+
+After the user approves (with any edits), cache any new answers in `DATA_DIR/application-data.md` under a "Custom Answers" section so they're reused on future applications.
+
+### Step 7: Fill Form
+
+After approval, fill everything in one pass.
+
+**Delegate to the subagent.** Invoke `scripts/fill-page.md` with:
 - ATS type (lever/greenhouse/workday/unknown)
-- Application data (all sections from application-data.md)
+- The approved field→value mapping (all answers, not just application data)
 - Tab ID
-- Job context (role, company) for any fields that need it
 - File paths for resume and cover letter uploads
 
-The subagent handles scanning, matching, and filling fields on the current page. It returns:
-- Fields filled (label → value)
-- Fields skipped (label → reason)
-- Whether this is a review/submit page
-- Any fields requiring user input
+The subagent fills all fields on the current page, then returns what was filled and what remains.
 
-**After the subagent returns:**
-- If fields need user input: ask the user, then re-invoke the subagent for those fields. Cache new answers in `DATA_DIR/application-data.md` under a "Custom Answers" section.
-- If this is a review/submit page: go to Step 6.
-- If there's a "Next" / "Save and Continue" button: click it, wait for the new page, then loop back with a new subagent invocation.
-- If submission succeeded (confirmation page detected): go to Step 7.
+**For multi-page forms (Workday):**
+1. Fill current page → click "Save and Continue"
+2. If validation errors: read the errors, fix the fields, retry
+3. On the new page: scan fields (Step 5 logic), match against the approved answers, fill, advance
+4. Repeat until reaching the review page
 
 **File upload handling:**
-MCP tools can only upload images via `upload_image`. For PDF/DOCX resume and cover letter uploads, tell the user the file path and ask them to upload manually. This is a known limitation.
+MCP tools can only upload images via `upload_image`. For PDF/DOCX resume and cover letter uploads, tell the user the file path and ask them to upload manually. This is a known limitation — include the path in the Step 6 summary so the user can upload while reviewing.
 
-### Step 6: Review Before Submit
+### Step 8: Review Before Submit
 
 When a review/confirmation page is reached or all fields on a single-page form are filled:
 
 1. Take a screenshot
-2. Summarize what was filled:
-   ```
-   Here's what I entered:
-   - First Name: Jane
-   - Last Name: Doe
-   - Email: jane@example.com
-   ...
-   ```
-3. Note any fields that were skipped or left empty
-4. **Ask the user for explicit confirmation before submitting** — this is a required explicit-permission action per browser automation rules
+2. Confirm everything looks correct
+3. **Ask the user for explicit confirmation before submitting** — this is a required explicit-permission action per browser automation rules
 
 Do NOT click Submit/Send until the user confirms.
 
-### Step 7: Log the Application
+### Step 9: Log the Application
 
 After submission (or if the user decides not to submit):
 
