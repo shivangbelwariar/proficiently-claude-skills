@@ -122,10 +122,11 @@ Omit the "Network" line if there are no contacts at that company.
 ### Step 7: Next Steps
 
 After presenting results, tell the user:
-- To tailor a resume: `/proficiently:tailor-resume [job URL]`
-- To write a cover letter: `/proficiently:cover-letter [job URL]`
+- To apply now (tailors resume, writes cover letter if needed, fills the form): `/proficiently:apply [job URL]`
+- To tailor a resume only: `/proficiently:tailor-resume [job URL]`
+- To write a cover letter only: `/proficiently:cover-letter [job URL]`
 
-**IMPORTANT**: Do NOT attempt to tailor resumes or write cover letters yourself. Those are separate skills with their own workflows. If the user asks to "build a resume" or "write a cover letter" for a job, direct them to use the appropriate skill command.
+**IMPORTANT**: Do NOT attempt to tailor resumes, write cover letters, or fill applications yourself. Those are separate skills with their own workflows. If the user asks to do any of these for a job, direct them to use the appropriate skill command.
 
 Also include at the end of results:
 
