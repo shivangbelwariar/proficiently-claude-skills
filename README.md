@@ -13,6 +13,7 @@ A Claude Code plugin for AI-powered job searching, resume tailoring, and cover l
 | [Tailor Resume](./skills/tailor-resume/) | `/proficiently:tailor-resume` | Create tailored resumes for specific job postings |
 | [Cover Letter](./skills/cover-letter/) | `/proficiently:cover-letter` | Write natural, persuasive cover letters |
 | [Network Scan](./skills/network-scan/) | `/proficiently:network-scan` | Scan your contacts' companies for matching job openings |
+| [Apply](./skills/apply/) | `/proficiently:apply` | Fill out job applications on Greenhouse, Lever, and Workday |
 
 ## How They Work Together
 
@@ -20,7 +21,8 @@ A Claude Code plugin for AI-powered job searching, resume tailoring, and cover l
 2. **`/proficiently:job-search`** finds jobs that match your preferences and resume, flags companies where you have connections
 3. **`/proficiently:tailor-resume`** rewrites your resume for a specific job posting, saves the job posting and tailored resume together
 4. **`/proficiently:cover-letter last`** writes a cover letter using the most recent job's posting and tailored resume
-5. **`/proficiently:network-scan`** scans your LinkedIn contacts' companies for matching openings (leverages your network for warm intros)
+5. **`/proficiently:apply last`** fills out the application form on Greenhouse, Lever, or Workday using your tailored resume and cover letter
+6. **`/proficiently:network-scan`** scans your LinkedIn contacts' companies for matching openings (leverages your network for warm intros)
 
 All skills share a `~/.proficiently/` directory for personal files. Each job application gets its own folder containing the posting, tailored resume, and cover letter.
 
@@ -87,6 +89,7 @@ proficiently-claude-skills/
 │       ├── data-directory.md           # Data directory resolution algorithm
 │       ├── prerequisites.md            # Prerequisites checking by skill
 │       ├── browser-setup.md            # Browser automation setup sequence
+│       ├── ats-patterns.md            # ATS navigation patterns (Greenhouse, Lever, Workday)
 │       └── priority-hierarchy.md       # Instruction priority hierarchy
 ├── skills/
 │   ├── setup/
@@ -102,7 +105,10 @@ proficiently-claude-skills/
 │   ├── cover-letter/
 │   │   ├── SKILL.md
 │   │   └── scripts/
-│   └── network-scan/
+│   ├── network-scan/
+│   │   ├── SKILL.md
+│   │   └── scripts/
+│   └── apply/
 │       ├── SKILL.md
 │       └── scripts/
 └── README.md
@@ -118,11 +124,13 @@ proficiently-claude-skills/
 ├── job-history.md                      # Running log from job-search
 ├── company-careers.json                # Cached careers page URLs
 ├── network-scan-history.md             # Running log from network-scan
+├── application-data.md                # Reusable form field answers
 └── jobs/                               # One folder per application
     ├── google-lead-gpm-2026-02-11/
     │   ├── posting.md                  # Saved job description
     │   ├── resume.md                   # Tailored resume
-    │   └── cover-letter.md             # Cover letter
+    │   ├── cover-letter.md             # Cover letter
+    │   └── applied.md                  # Application log (date, ATS, status)
     └── ...
 ```
 
