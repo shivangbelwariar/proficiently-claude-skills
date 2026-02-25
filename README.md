@@ -37,8 +37,16 @@ All skills share a `~/.proficiently/` directory for personal files. Each job app
 
 ### Option B: Claude Code CLI
 
+First, add the repository as a marketplace:
+
 ```bash
-claude plugin add https://github.com/proficientlyjobs/proficiently-claude-skills.git
+claude plugin marketplace add https://github.com/proficientlyjobs/proficiently-claude-skills.git
+```
+
+Then install the plugin:
+
+```bash
+claude plugin install proficiently@proficiently
 ```
 
 Then run setup:
@@ -66,7 +74,7 @@ cp /path/to/your/resume.pdf ~/.proficiently/resume/
 
 ## File Structure
 
-**Plugin (installed via `claude plugin add`):**
+**Plugin (installed via marketplace):**
 ```
 proficiently-claude-skills/
 ├── .claude-plugin/
