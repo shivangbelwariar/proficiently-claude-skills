@@ -4,9 +4,7 @@ A Claude Code plugin for AI-powered job searching, resume tailoring, and cover l
 
 > **Want someone to handle your entire job search?** Proficiently finds you jobs, tailors your resume and cover letters, applies on your behalf, and gets you in touch with hiring managers. Visit [proficiently.com](https://proficiently.com) to get started.
 
-
-https://github.com/user-attachments/assets/ea487f9c-7112-4b19-a86e-e56bd470837c
-
+![proficiently-demo](https://github.com/user-attachments/assets/2f39a093-bf7b-4c43-a7b5-c3e6251440e4)
 
 ## Skills
 
