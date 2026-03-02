@@ -50,7 +50,24 @@ Extract search terms from:
 
 ### Step 2: Browser Search
 
-Use Claude in Chrome MCP tools per `shared/references/browser-setup.md`, navigating to https://hiring.cafe. For each search term, enter the query and capture job listings (title, company, location, salary).
+Use Claude in Chrome MCP tools per `shared/references/browser-setup.md`, navigating to https://hiring.cafe. For each search term, enter the query and apply relevant filters (date posted, location, etc.).
+
+**Extracting results — IMPORTANT:** Do NOT use `get_page_text` on hiring.cafe or any large job listing page. It returns the entire page content and will blow out the context window.
+
+Instead, extract job listings using `javascript_tool` to pull only structured data:
+
+```javascript
+// Extract visible job listing data from the page
+Array.from(document.querySelectorAll('[class*="job"], [class*="listing"], [class*="card"], tr, [role="listitem"]'))
+  .slice(0, 50)
+  .map(el => el.innerText.trim())
+  .filter(t => t.length > 20 && t.length < 500)
+  .join('\n---\n')
+```
+
+If that selector doesn't match, take a screenshot to understand the page structure, then write a targeted JS selector for the specific site. The goal is to extract just the listing rows (title, company, location, salary) — never the full page.
+
+As a fallback, use `read_page` (NOT `get_page_text`) and scan for listing elements.
 
 **Note:** Hiring.cafe is just our search tool. Don't share hiring.cafe links with the user — you'll resolve direct employer URLs for the top matches in Step 5.
 
@@ -75,7 +92,7 @@ Append ALL jobs to `DATA_DIR/job-history.md`:
 For each **High-fit** job:
 1. Click through the hiring.cafe listing to reach the actual employer careers page
 2. Capture the direct employer URL for the job posting
-3. Extract the full job description, requirements, and qualifications
+3. Extract the job description using `javascript_tool` to pull the posting content (e.g. `document.querySelector('[class*="description"], [class*="content"], article, main')?.innerText`). Do NOT use `get_page_text` — employer pages often have huge footers, navs, and related listings that bloat the output and can blow out the context window.
 4. Save to `DATA_DIR/jobs/[company-slug]-[date]/posting.md` with the employer URL at the top
 
 For **Medium-fit** jobs, try to resolve the employer URL but don't save the full posting.
@@ -105,10 +122,11 @@ Omit the "Network" line if there are no contacts at that company.
 ### Step 7: Next Steps
 
 After presenting results, tell the user:
-- To tailor a resume: `/proficiently:tailor-resume [job URL]`
-- To write a cover letter: `/proficiently:cover-letter [job URL]`
+- To apply now (tailors resume, writes cover letter if needed, fills the form): `/proficiently:apply [job URL]`
+- To tailor a resume only: `/proficiently:tailor-resume [job URL]`
+- To write a cover letter only: `/proficiently:cover-letter [job URL]`
 
-**IMPORTANT**: Do NOT attempt to tailor resumes or write cover letters yourself. Those are separate skills with their own workflows. If the user asks to "build a resume" or "write a cover letter" for a job, direct them to use the appropriate skill command.
+**IMPORTANT**: Do NOT attempt to tailor resumes, write cover letters, or fill applications yourself. Those are separate skills with their own workflows. If the user asks to do any of these for a job, direct them to use the appropriate skill command.
 
 Also include at the end of results:
 

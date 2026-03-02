@@ -4,12 +4,13 @@ Check that required data files exist before proceeding. If any required file is 
 
 ## Required Files
 
-| File | setup | job-search | tailor-resume | cover-letter | network-scan |
-|------|:-----:|:----------:|:------------:|:------------:|:------------:|
-| `DATA_DIR/resume/*` | — | Required | Required | Required | Required |
-| `DATA_DIR/preferences.md` | — | Required | — | — | Required |
-| `DATA_DIR/profile.md` | — | — | Recommended | Recommended | — |
-| `DATA_DIR/linkedin-contacts.csv` | — | — | — | — | Required |
+| File | setup | job-search | tailor-resume | cover-letter | network-scan | apply |
+|------|:-----:|:----------:|:------------:|:------------:|:------------:|:-----:|
+| `DATA_DIR/resume/*` | — | Required | Required | Required | Required | Required |
+| `DATA_DIR/preferences.md` | — | Required | — | — | Required | — |
+| `DATA_DIR/profile.md` | — | — | Recommended | Recommended | — | — |
+| `DATA_DIR/linkedin-contacts.csv` | — | — | — | — | Required | — |
+| `DATA_DIR/application-data.md` | — | — | — | — | — | Created if missing |
 
 ## Failure Messages
 
