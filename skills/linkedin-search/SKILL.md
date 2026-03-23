@@ -135,16 +135,21 @@ For each High-fit job:
 
 For **Medium-fit** jobs: attempt to resolve employer URL but don't save full posting.
 
-### Step 6: Auto-Apply to All High-Fit Jobs
+### Step 6: Auto-Apply to All High-Fit Jobs (3 in parallel)
 
 **Do this automatically without asking the user. Do NOT present results first and wait — start applying immediately.**
 
-For each High-fit job with a resolved employer URL:
+Group all High-fit jobs with resolved employer URLs into batches of 3. For each batch:
 
-1. Use the original resume from `DATA_DIR/resume/` as-is — never tailor
-2. Run the apply workflow per `skills/apply/SKILL.md` — fill and auto-submit. Do not pause for approval or confirmation between jobs.
-3. Log result to `DATA_DIR/job-history.md`
-4. Move immediately to the next job
+1. **Open 3 tabs simultaneously** — call `tabs_create_mcp` three times, navigate each to its employer URL
+2. **Dispatch 3 apply subagents IN PARALLEL** — in a single Agent tool call with 3 independent sub-tasks, each receiving:
+   - Tab ID (the pre-opened tab for this job)
+   - Employer URL
+   - Resume path: `/Users/gbelwariar/.proficiently/resume/Palak_SSE_Resume (1).pdf`
+   - Full apply workflow per `skills/apply/SKILL.md` with argument `tab:<tabId>`
+3. **Wait for all 3 to complete**, then log all 3 results to `DATA_DIR/job-history.md`
+4. If a tab fails/crashes, log it as `apply-failed` and continue — do not block the other 2
+5. Move to next batch of 3
 
 After all High-fit jobs are processed, loop back to Step 1 with different search keywords from `preferences.md`. Keep running continuously — never stop unless there are zero new results and all queues are empty.
 

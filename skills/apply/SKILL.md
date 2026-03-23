@@ -72,6 +72,11 @@ Parse `$ARGUMENTS`:
 - Skip navigation — will use the current browser tab as-is
 - Match the tab's URL against saved job folders to load context if possible
 
+**If "tab:\<tabId\>" (called from parallel batch):**
+- Skip navigation — the tab is already open and navigated to the employer URL
+- Use the provided tab ID directly for all browser tool calls
+- Do not call `tabs_context_mcp` or `tabs_create_mcp`
+
 Report what's loaded:
 
 ```
