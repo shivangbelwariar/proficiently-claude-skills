@@ -293,11 +293,11 @@ The subagent fills all fields on the current page, then returns what was filled 
 6. Repeat until reaching the review page
 
 **File upload handling:**
-Resume path: `/Users/gbelwariar/.proficiently/resume/Palak_SSE_Resume (1).pdf`
+Resume path: read from `DATA_DIR/application-data.md` → File Paths → Resume PDF
 For resume/cover letter file uploads:
-1. Use chrome-devtools `upload_file` tool with `selector='input[type="file"]'` and the resume path
-2. If selector not found: click the upload button/label first, then retry `upload_file`
-3. If both fail, log as "upload-skipped" — do NOT use JavaScript CORS workarounds or start HTTP servers
+1. If `simplify_already_filled: true` → **skip file upload entirely** — Simplify already uploaded the resume
+2. Otherwise: use `mcp__claude-in-chrome__upload_image(tabId, filePath)` with the resume path
+3. If that fails, log as "upload-skipped" — do NOT use `chrome-devtools upload_file`, do NOT start HTTP servers, do NOT use JavaScript CORS workarounds
 
 ### Step 8: Auto-Submit
 
