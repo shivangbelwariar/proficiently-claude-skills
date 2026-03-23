@@ -154,6 +154,29 @@ Set up browser per `shared/references/browser-setup.md` (`tabs_context` → `tab
 - Navigate to the URL, take a screenshot
 - Attempt to identify the form. If unrecognizable, tell the user and ask for guidance.
 
+### Step 3.5: Try Simplify Autofill First
+
+**Always attempt Simplify before any manual filling.** Simplify handles ~70-80% of Greenhouse, Lever, Workday, iCIMS, and Jobvite forms automatically.
+
+1. Wait 2 seconds for the page to fully load
+2. **Zoom into the bottom-right corner** to check for the Simplify icon:
+   ```
+   computer(action="zoom", region=[1100, 500, 1312, 768])
+   ```
+   The Simplify icon is a small gray/silver rounded square with 3-4 horizontal white stripes (stacked lines).
+3. **If the Simplify icon is visible:**
+   - Click it to trigger autofill
+   - Wait 3 seconds for Simplify to fill the form
+   - Take a screenshot to see what was filled
+   - **Correct these fields immediately after Simplify fills** (Simplify often gets them wrong):
+     - **School/University**: Simplify may fill wrong school — overwrite with "Rajasthan Technical University, Kota" (or "Other" if dropdown)
+     - **Field of Study**: must be "Computer Engineering" exactly
+     - **Graduation Year**: must be 2019
+     - Any field that looks blank or wrong compared to `application-data.md`
+   - After correction, skip to **Step 7** (submit) — no need to manually fill every field
+4. **If no Simplify icon appears after 3 seconds:**
+   - Simplify doesn't support this form — continue with manual Steps 5-7 below
+
 **Scout the form.** Once on the application form, do a quick scan (`read_page(filter="interactive")` or scroll through for Workday) to determine:
 - Does the form have a **resume/CV upload** field?
 - Does the form have a **cover letter** upload or text field?
