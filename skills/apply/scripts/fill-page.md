@@ -48,15 +48,14 @@ Cross-reference every required field against the provided field mapping. If any 
 
 If invoked with `simplify_already_filled: true`, the Simplify extension has already autofilled most fields.
 
-**Do NOT blindly re-fill everything from the mapping.** Instead:
-1. Read current field values first using `read_page(filter="interactive")` and `find()`
-2. **Only fill/overwrite fields that are:**
-   - Empty, blank, or showing placeholder text ("Select One", "Type here...", etc.)
-   - School/University fields → ALWAYS overwrite with "Rajasthan Technical University, Kota" regardless of what Simplify put
-   - Field of Study → ALWAYS overwrite with "Computer Engineering"
-   - Graduation Year → ALWAYS overwrite with "2019"
-3. **Leave all other pre-filled values as Simplify set them** — Simplify's profile data is correct for everything else
-4. After verify/correct pass, still do the full required-field verification scan before returning results
+**Do NOT re-read the page — Simplify already ran and was verified.** Instead go directly to:
+1. **Overwrite the 3 known-bad Simplify fields** (only if present — use `find` to check first):
+   - School/University → "Rajasthan Technical University, Kota"
+   - Field of Study → "Computer Engineering"
+   - Graduation Year → "2019"
+2. **Run `find("Select One")`** — fill any unfilled required dropdowns Simplify missed
+3. **Run `find("*")`** — fill any unfilled required fields Simplify missed
+4. Done — Simplify handled everything else correctly
 
 ## Input
 
@@ -97,22 +96,17 @@ You already have a tab ID — do not create a new tab.
 - **Read-only fields** (like email pre-filled from Workday account): skip these
 - For file uploads: attempt upload, skip if fails — do NOT stop workflow
 
-**CRITICAL: Full-page scroll-and-fill loop for Workday (MANDATORY):**
-You MUST cover the ENTIRE page, filling REQUIRED (*) fields only:
-1. Scroll to the TOP of the page first
-2. Call `read_page(tabId, filter="interactive")` to get all visible fields
-3. Fill all visible **required (*)** fields — skip optional ones
-4. Also use `find("Select One")` to catch any unfilled required dropdowns in this viewport
-5. Scroll DOWN by one viewport height using `computer(action="scroll", coordinate=[760, 400], direction="down", amount=5)`
-6. Call `read_page` again to discover newly visible fields
-7. Fill any new required fields found
-8. Repeat steps 5-7 until reaching the bottom of the page (no new interactive fields appear)
-9. **Final verification pass** — scroll back to TOP, then scan top-to-bottom one more time:
-   - At each viewport: call `read_page(filter="interactive")` and check every required (*) field
-   - Look for: empty text inputs, "Select One" dropdowns, unfilled radio groups
-   - Use `find("Select One")` and `find("Required")` to catch any remaining empties
-   - Fill any still-empty required field immediately
-10. Only THEN return your results
+**CRITICAL: Single scroll-fill loop for Workday (MANDATORY):**
+Fill and verify in ONE pass — no separate verification scroll:
+1. Scroll to the TOP of the page
+2. Loop until bottom:
+   a. `read_page(tabId, filter="interactive")` — get visible fields
+   b. Fill ALL visible **required (*)** fields immediately — skip optional
+   c. `computer(action="scroll", coordinate=[760, 400], direction="down", amount=5)`
+   d. Stop when no new interactive fields appear after scrolling
+3. At the bottom: run `find("Select One")` ONCE — fill any still-empty required dropdowns
+4. Run `find("Required")` ONCE — fill any still-empty required fields found
+5. Done — the single pass IS the verification. Return results.
 
 ### Unknown ATS
 - Try `form_input` first

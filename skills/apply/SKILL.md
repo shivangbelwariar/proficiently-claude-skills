@@ -208,42 +208,31 @@ If the page shows a sign-in / login form (detected by `find("Sign in")`, `find("
      - Fill any still-empty required (*) fields using `application-data.md` — skip optional ones
    - Skip to **Step 7**, passing `simplify_already_filled: true` to the fill-page subagent
 
-**Scout the form** — single JS call (no read_page needed):
+### Step 4: Prepare Materials
+
+**Run this single combined JS call** — detects file fields AND required fields in one shot:
 ```javascript
 ({
   hasResume: !!document.querySelector('input[type="file"]'),
-  hasCoverLetter: [...document.querySelectorAll('label,textarea,input')].some(el => /cover.?letter/i.test(el.innerText || el.placeholder || el.name || ''))
+  hasCoverLetter: [...document.querySelectorAll('label,textarea,input')].some(el => /cover.?letter/i.test(el.innerText || el.placeholder || el.name || '')),
+  requiredFields: Array.from(document.querySelectorAll('label,[aria-required="true"],[required]'))
+    .filter(el => el.innerText?.includes('*') || el.getAttribute('aria-required')==='true' || el.hasAttribute('required'))
+    .map(el => ({ label: el.innerText?.replace(/\*/g,'').trim(), ref: el.htmlFor||el.id||'' }))
+    .filter(f => f.label)
 })
 ```
-Use this result to determine what materials to generate in Step 4.
-
-### Step 4: Prepare Materials
+Also run `find("*")` and `find("Select One")` as backup catchers for radio buttons and Workday dropdowns the JS misses.
 
 **Resume: NEVER tailor. Always use the original resume as-is.**
-Resume is hardcoded at: `/Users/gbelwariar/.proficiently/resume/Palak_SSE_Resume (1).pdf` — use this path directly. Do not search DATA_DIR/resume/, do not modify the file in any way.
+Resume is hardcoded at: `/Users/gbelwariar/.proficiently/resume/Palak_SSE_Resume (1).pdf` — use this path directly.
 
-**Cover letter: only if the form requires one.** If the scout in Step 3 found a cover letter field:
-- Check if `DATA_DIR/jobs/[job-folder]/cover-letter.md` exists
-- If YES: already done. Skip.
-- If NO: Run the cover-letter skill inline. Follow the workflow in `skills/cover-letter/SKILL.md` — use the posting and profile. Save to the job folder. Proceed without user review.
-
-**If the form doesn't have a cover letter field**, skip cover letter generation entirely.
+**Cover letter: only if `hasCoverLetter` was true.** Check if `DATA_DIR/jobs/[job-folder]/cover-letter.md` exists — if not, run the cover-letter skill inline and save it. Skip entirely if no cover letter field found.
 
 ### Step 5: Build Required-Field Inventory
 
-Before filling anything, identify **only the required (*) fields**. Optional fields are ignored entirely — do not add them to the filling list.
+The combined JS in Step 4 already returned `requiredFields`. Use that as the base inventory.
 
-**Run this JS to get required fields:**
-```javascript
-Array.from(document.querySelectorAll('label, [aria-required="true"], [required]'))
-  .filter(el => el.innerText?.includes('*') || el.getAttribute('aria-required') === 'true' || el.hasAttribute('required'))
-  .map(el => ({ label: el.innerText?.replace(/\*/g,'').trim(), ref: el.htmlFor || el.id || '' }))
-  .filter(f => f.label)
-```
-
-Also run `find("*")`, `find("Required")`, `find("Select One")` to catch anything the JS misses (especially radio buttons and Workday dropdowns).
-
-**For Workday (multi-page):** scroll TOP to BOTTOM running the JS at each viewport — required fields may be below the fold. Use `find("Yes")` / `find("No")` to find required radio buttons invisible to JS.
+**For Workday (multi-page):** scroll TOP to BOTTOM running the combined JS at each viewport — required fields may be below the fold. Merge results across viewports. Use `find("Yes")` / `find("No")` to find required radio buttons invisible to JS.
 
 **Result: a complete required-field inventory** — every field that must be filled before submission. This is the ONLY list used in Step 6.
 
@@ -330,6 +319,7 @@ Create `DATA_DIR/jobs/[company-slug]-[date]/applied.md`:
 ```
 
 Update `DATA_DIR/job-history.md` — find the entry for this job and append the application status and date.
+
 
 Present to user:
 
