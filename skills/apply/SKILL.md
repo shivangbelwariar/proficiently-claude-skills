@@ -172,11 +172,11 @@ Set up browser per `shared/references/browser-setup.md` (`tabs_context` → `tab
      - **School/University**: Simplify may fill wrong school — overwrite with "Rajasthan Technical University, Kota" (or "Other" if dropdown)
      - **Field of Study**: must be "Computer Engineering" exactly
      - **Graduation Year**: must be 2019
-   - **Then do a mandatory full required-field verification scan:**
-     - Use `find("Select One")` to catch any unfilled dropdowns
-     - Use `find("Required")` to find blank required fields
+   - **Then verify REQUIRED (*) fields only** — do not touch optional fields:
+     - Use `find("*")` and `find("Required")` to get the required-field inventory
+     - Use `find("Select One")` to catch unfilled required dropdowns
      - Scroll top-to-bottom checking every required (*) field has a real value
-     - Fill any still-empty required fields using `application-data.md` before proceeding
+     - Fill any still-empty required (*) fields using `application-data.md` — skip optional ones
    - Skip to **Step 7**, passing `simplify_already_filled: true` to the fill-page subagent
 4. **If no Simplify icon appears after 3 seconds:**
    - Simplify doesn't support this form — continue with manual Steps 5-7 below
@@ -200,32 +200,34 @@ Use `DATA_DIR/resume/` — find the PDF or DOCX file there and use it directly f
 
 **If the form doesn't have a cover letter field**, skip cover letter generation entirely.
 
-### Step 5: Scan All Fields
+### Step 5: Build Required-Field Inventory
 
-Before filling anything, scan the entire form to discover every field. Do NOT fill fields during this step — read only.
+Before filling anything, identify **only the required (*) fields**. Optional fields are ignored entirely — do not add them to the filling list.
 
-**For Lever/Greenhouse (single-page forms):**
-- Call `read_page(tabId, filter="interactive")` to get all fields at once
+**Run this JS to get required fields:**
+```javascript
+Array.from(document.querySelectorAll('label, [aria-required="true"], [required]'))
+  .filter(el => el.innerText?.includes('*') || el.getAttribute('aria-required') === 'true' || el.hasAttribute('required'))
+  .map(el => ({ label: el.innerText?.replace(/\*/g,'').trim(), ref: el.htmlFor || el.id || '' }))
+  .filter(f => f.label)
+```
 
-**For Workday (multi-step wizard):**
-- Scroll from TOP to BOTTOM, calling `read_page(tabId, filter="interactive")` at EVERY viewport position
-- **Also use `find` tool** to discover elements that `read_page` misses:
-  - `find("Required")` — all required field labels
-  - `find("Select One")` — unfilled dropdowns
-  - `find("Yes")` / `find("No")` — radio button options
-  - `find("How Did You Hear")` — the hierarchical source dropdown
-- Compile the COMPLETE list of ALL fields (including below-fold and radio buttons) before proceeding to Step 6
-- Note: you'll scan each wizard page as you reach it (see Step 7)
+Also run `find("*")`, `find("Required")`, `find("Select One")` to catch anything the JS misses (especially radio buttons and Workday dropdowns).
 
-**For each field found**, record:
-- Field label
-- Field type (text, dropdown, radio, checkbox, file upload)
-- Whether it's required
-- The element ref for later filling
+**For Workday (multi-page):** scroll TOP to BOTTOM running the JS at each viewport — required fields may be below the fold. Use `find("Yes")` / `find("No")` to find required radio buttons invisible to JS.
 
-### Step 6: Auto-Fill All Fields (No Approval Needed)
+**Result: a complete required-field inventory** — every field that must be filled before submission. This is the ONLY list used in Step 6.
 
-Generate a proposed answer for every field using this priority:
+**Exceptions — always include regardless of required status:**
+- Resume/CV upload field
+- Cover letter upload/text field (if present)
+- Privacy policy / terms checkboxes
+
+### Step 6: Auto-Fill Required Fields Only (No Approval Needed)
+
+**Only generate answers for fields in the required-field inventory from Step 5. Skip all optional fields.**
+
+Generate an answer for each required field using this priority:
 1. **Application data** — match from `application-data.md` per the Field Matching Reference below
 2. **Reasonable defaults** — for common fields not in application data:
    - Legal First/Last Name → same as First/Last Name
