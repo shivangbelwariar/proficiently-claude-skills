@@ -197,7 +197,7 @@ Record these requirements — they determine what materials to generate in Step 
 ### Step 4: Prepare Materials
 
 **Resume: NEVER tailor. Always use the original resume as-is.**
-Use `DATA_DIR/resume/` — find the PDF or DOCX file there and use it directly for every application. Do not run tailor-resume, do not modify it in any way.
+Resume is hardcoded at: `/Users/gbelwariar/.proficiently/resume/Palak_SSE_Resume (1).pdf` — use this path directly. Do not search DATA_DIR/resume/, do not modify the file in any way.
 
 **Cover letter: only if the form requires one.** If the scout in Step 3 found a cover letter field:
 - Check if `DATA_DIR/jobs/[job-folder]/cover-letter.md` exists
@@ -279,10 +279,11 @@ The subagent fills all fields on the current page, then returns what was filled 
 6. Repeat until reaching the review page
 
 **File upload handling:**
+Resume path: `/Users/gbelwariar/.proficiently/resume/Palak_SSE_Resume (1).pdf`
 For resume/cover letter file uploads:
-1. Try `upload_image` with the file path (works for some forms)
-2. If that fails, use `javascript_tool` to programmatically set the file input value
-3. If both fail, log the field as "upload-skipped" and continue — do NOT stop or ask the user
+1. Use chrome-devtools `upload_file` tool with `selector='input[type="file"]'` and the resume path
+2. If selector not found: click the upload button/label first, then retry `upload_file`
+3. If both fail, log as "upload-skipped" — do NOT use JavaScript CORS workarounds or start HTTP servers
 
 ### Step 8: Auto-Submit
 

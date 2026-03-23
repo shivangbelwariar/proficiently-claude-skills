@@ -122,15 +122,19 @@ You MUST cover the ENTIRE page, filling REQUIRED (*) fields only:
 
 ## File Upload Fields
 
+Resume is always at: `/Users/gbelwariar/.proficiently/resume/Palak_SSE_Resume (1).pdf`
+
 For resume/cover letter PDF/DOCX uploads:
-1. First, try `upload_image` with the file path — some forms accept it
-2. If that fails, try `javascript_tool` to set the file input programmatically:
-   ```javascript
-   // Trigger file input with the given path
-   const input = document.querySelector('input[type="file"]');
-   // Attempt drag-and-drop or DataTransfer approach
+1. Use the chrome-devtools `upload_file` tool — this directly injects the file into the input element without any CORS workarounds:
    ```
-3. If both fail, log the field as "upload-skipped" in fields_failed and continue — do NOT stop the workflow
+   mcp__plugin_chrome-devtools-mcp_chrome-devtools__upload_file(
+     pageId=<pageId>, selector='input[type="file"]',
+     filePath='/Users/gbelwariar/.proficiently/resume/Palak_SSE_Resume (1).pdf'
+   )
+   ```
+2. If the selector `input[type="file"]` is not found: use `find()` to locate the upload button/label, click it to reveal the input, then retry `upload_file`
+3. If `upload_file` fails: try `mcp__claude-in-chrome__upload_image` as fallback
+4. If all fail, log as "upload-skipped" in fields_failed and continue — **do NOT start HTTP servers, do NOT use JavaScript CORS fetch workarounds**
 
 ## Output Format
 
