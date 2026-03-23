@@ -41,7 +41,7 @@ def normalize_salary(job) -> str:
     return ""
 
 
-def scrape_with_retry(search_term, location, results_wanted, hours_old, is_remote, max_retries=3):
+def scrape_with_retry(search_term, location, results_wanted, hours_old, is_remote, offset=0, max_retries=3):
     """Scrape LinkedIn with exponential backoff on rate limit errors."""
     delays = [5, 15, 45]
     for attempt in range(max_retries):
@@ -53,6 +53,7 @@ def scrape_with_retry(search_term, location, results_wanted, hours_old, is_remot
                 results_wanted=results_wanted,
                 hours_old=hours_old,
                 is_remote=is_remote,
+                offset=offset,
                 description_format="markdown",
                 verbose=0,
             )
@@ -80,6 +81,7 @@ def main():
     parser.add_argument("--results", type=int, default=50, help="Max results (default 50, LinkedIn rate-limits at ~100)")
     parser.add_argument("--hours", type=int, default=72, help="Max age of postings in hours (default 72)")
     parser.add_argument("--remote", action="store_true", help="Remote jobs only")
+    parser.add_argument("--offset", type=int, default=0, help="Pagination offset (default 0)")
     args = parser.parse_args()
 
     # Cap at 50 to stay within LinkedIn's rate limit comfort zone
@@ -91,6 +93,7 @@ def main():
         results_wanted=results_wanted,
         hours_old=args.hours,
         is_remote=args.remote,
+        offset=args.offset,
     )
 
     if jobs_df is None or len(jobs_df) == 0:

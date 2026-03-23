@@ -45,33 +45,44 @@ Extract location preference from `preferences.md` (default: "San Jose, CA").
 
 ### Step 2: LinkedIn Search via JobSpy
 
-**Do NOT open a browser for this step.** Use the Bash tool to call the JobSpy scraper:
+**Do NOT open a browser for this step.** Use the Bash tool to call the JobSpy scraper.
+
+**Determine search parameters:**
+- **If `$ARGUMENTS` is empty or not provided:** Read `DATA_DIR/preferences.md`, find `## Default Search URLs > LinkedIn`, and use these defaults extracted from it:
+  - `--search "software engineer"`
+  - `--location "San Francisco Bay Area"`
+  - `--hours 168` (7 days, matching `f_TPR=r604800`)
+- **If `$ARGUMENTS` is provided:** Use `$ARGUMENTS` as the search term; keep default location and hours.
+
+**Pagination — run 3 pages per search term to collect up to 150 results:**
 
 ```bash
-python3 "<SKILL_DIR>/scripts/jobspy_search.py" \
-  --search "<search_term>" \
-  --location "<location>" \
-  --results 50 \
-  --hours 72
+SKILL_DIR="<directory containing this SKILL.md>"
+
+# Page 1
+python3 "$SKILL_DIR/scripts/jobspy_search.py" --search "<term>" --location "<location>" --results 50 --hours <hours> --offset 0
+
+# Page 2
+python3 "$SKILL_DIR/scripts/jobspy_search.py" --search "<term>" --location "<location>" --results 50 --hours <hours> --offset 50
+
+# Page 3
+python3 "$SKILL_DIR/scripts/jobspy_search.py" --search "<term>" --location "<location>" --results 50 --hours <hours> --offset 100
 ```
 
-Where `<SKILL_DIR>` is the directory containing this SKILL.md file.
+Stop paginating if a page returns 0 results (no more jobs available).
 
-For remote-only searches, add `--remote` flag.
+**Run searches for all target roles** from `preferences.md` (e.g., "software engineer", "java developer", "backend engineer"). Combine all results and deduplicate by `(company, title)` before proceeding.
 
-**Parse the JSON output.** Each job has:
-- `title`, `company`, `location`, `salary` — standard fields
+**Parse the JSON output from each call.** Each job has:
+- `title`, `company`, `location`, `salary`
 - `link` — LinkedIn job URL (`linkedin.com/jobs/view/...`)
 - `source` — always "linkedin"
 - `date_posted`, `is_remote`, `job_type`
-- `description` — first 500 chars of job description
+- `description` — first 500 chars
 
-**If the script returns `[]` or errors:**
+**If all pages return `[]` or errors:**
 - Log "LinkedIn returned 0 results for [term]"
-- Try next search term from preferences
-- Do NOT fall back to hiring.cafe — they are separate tools
-
-**Run one search per target role from preferences** (e.g., "java developer", "backend engineer", "software engineer"). Combine and deduplicate results by `(company, title)` before proceeding.
+- Try next search term — do NOT fall back to hiring.cafe
 
 ### Step 3: Evaluate and Filter Jobs
 
