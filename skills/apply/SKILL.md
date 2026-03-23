@@ -154,47 +154,32 @@ Set up browser per `shared/references/browser-setup.md` (`tabs_context` → `tab
 - Navigate to the URL, take a screenshot
 - Attempt to identify the form. If unrecognizable, tell the user and ask for guidance.
 
-**Auth Gate — applies to ANY ATS after navigation:**
-After navigating to the application URL, check if the page shows a login/sign-in wall using `find("Sign in")`, `find("Log in")`, or `find("password")`.
-If a login form is detected:
-1. **Try signing in first** using credentials from `DATA_DIR/application-data.md`:
-   - Email: `REDACTED_EMAIL`, Password: `REDACTED_PASSWORD`
-   - Submit and check for success
-2. **If sign-in fails** ("wrong password", "account not found", "invalid credentials", "locked"):
-   - Look for "Create account", "Sign up", "Register", "New user?" — click it
-   - Fill the registration form using First Name (`Fnu`), Last Name (`Palak`), Email, Password from application-data.md
-   - If email verification is required: use Gmail MCP (`gmail_search_messages` with query `"verify" OR "confirm" OR "activate" OR "OTP"`, max age 3 minutes) to retrieve the code or link, then complete verification
-   - Once registered and signed in, navigate to the application form and continue
-3. **If no signup option exists and sign-in keeps failing**: log as `login-failed-no-signup` in job history, skip this job, move to next
-
 ### Step 3.5: Try Simplify Autofill First
 
 **Always attempt Simplify before any manual filling.** Simplify handles ~70-80% of Greenhouse, Lever, Workday, iCIMS, and Jobvite forms automatically.
 
 1. Wait 2 seconds for the page to fully load
-2. **Zoom into the bottom-right corner** to check for Simplify:
+2. **Zoom into the bottom-right corner** to check for the Simplify icon:
    ```
    computer(action="zoom", region=[1100, 500, 1312, 768])
    ```
-3. **Determine Simplify state:**
-   - **Panel already open** (shows "Autofill this page" or "Autofill" button visible): click that button directly — do NOT click the icon
-   - **Only the icon visible** (small gray/silver square with horizontal stripes): click the icon to open the panel, then click "Autofill this page"
-   - **Neither visible**: Simplify is not active — skip to manual Steps 5-7
-4. **After clicking Autofill:**
-   - Poll for success using `find("complete")` every 2 seconds, up to 8 seconds total
-   - **If "Autofill complete!" appears** → Simplify succeeded. Continue to step 5 below.
-   - **If no confirmation after 8s** AND form fields are still empty → Simplify failed — continue with manual Steps 5-7
-5. **After successful Simplify fill:**
-   - **Correct these fields** (Simplify often gets them wrong):
-     - **School/University** → overwrite with "Rajasthan Technical University, Kota" (or "Other" if dropdown)
-     - **Field of Study** → overwrite with "Computer Engineering"
-     - **Graduation Year** → overwrite with "2019"
-   - **Verify REQUIRED (*) fields only** — do not touch optional fields:
+   The Simplify icon is a small gray/silver rounded square with 3-4 horizontal white stripes (stacked lines).
+3. **If the Simplify icon is visible:**
+   - Click it to trigger autofill
+   - Wait 3 seconds for Simplify to fill the form
+   - Take a screenshot to see what was filled
+   - **Correct these fields immediately after Simplify fills** (Simplify often gets them wrong):
+     - **School/University**: Simplify may fill wrong school — overwrite with "Rajasthan Technical University, Kota" (or "Other" if dropdown)
+     - **Field of Study**: must be "Computer Engineering" exactly
+     - **Graduation Year**: must be 2019
+   - **Then verify REQUIRED (*) fields only** — do not touch optional fields:
      - Use `find("*")` and `find("Required")` to get the required-field inventory
      - Use `find("Select One")` to catch unfilled required dropdowns
      - Scroll top-to-bottom checking every required (*) field has a real value
      - Fill any still-empty required (*) fields using `application-data.md` — skip optional ones
    - Skip to **Step 7**, passing `simplify_already_filled: true` to the fill-page subagent
+4. **If no Simplify icon appears after 3 seconds:**
+   - Simplify doesn't support this form — continue with manual Steps 5-7 below
 
 **Scout the form.** Once on the application form, do a quick scan (`read_page(filter="interactive")` or scroll through for Workday) to determine:
 - Does the form have a **resume/CV upload** field?
@@ -299,13 +284,6 @@ When a review/confirmation page is reached or all fields on a single-page form a
 
 1. Take a screenshot and save it to `DATA_DIR/jobs/[company-slug]-[date]/screenshot.png` for records
 2. Click Submit/Send/Apply automatically — do not ask the user for confirmation
-3. **After clicking Submit**, check for errors using `find("spam")` or `find("couldn't submit")`:
-   - **If "flagged as possible spam"** error appears:
-     - Wait 5 seconds
-     - Click Submit again (one retry)
-     - If spam error appears again: log as `spam-blocked`, skip this job, move to next
-     - If success: log normally
-   - **If no error**: proceed to Step 9
 
 ### Step 9: Log the Application
 
