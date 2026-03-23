@@ -167,7 +167,6 @@ Set up browser per `shared/references/browser-setup.md` (`tabs_context` → `tab
 3. **If the Simplify icon is visible:**
    - Click it to trigger autofill
    - Wait 3 seconds for Simplify to fill the form
-   - Take a screenshot to see what was filled
    - **Correct these fields immediately after Simplify fills** (Simplify often gets them wrong):
      - **School/University**: Simplify may fill wrong school — overwrite with "Rajasthan Technical University, Kota" (or "Other" if dropdown)
      - **Field of Study**: must be "Computer Engineering" exactly
