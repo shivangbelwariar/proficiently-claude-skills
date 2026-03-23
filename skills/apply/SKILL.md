@@ -125,6 +125,8 @@ If it does NOT exist:
 
 Set up browser per `shared/references/browser-setup.md` (`tabs_context` → `tabs_create` → `navigate`).
 
+**Tab creation rule**: ALWAYS use `mcp__claude-in-chrome__tabs_create_mcp(url)`. NEVER use `mcp__plugin_chrome-devtools-mcp_chrome-devtools__new_page` — it opens in the wrong Chrome window (no Simplify, no logins).
+
 **If `$ARGUMENTS` is "current"**: Skip navigation. Call `tabs_context_mcp` to get the active tab.
 
 **Otherwise**, detect ATS type from URL patterns (see `shared/references/ats-patterns.md`) and navigate accordingly:
