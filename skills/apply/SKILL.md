@@ -154,6 +154,19 @@ Set up browser per `shared/references/browser-setup.md` (`tabs_context` → `tab
 - Navigate to the URL, take a screenshot
 - Attempt to identify the form. If unrecognizable, tell the user and ask for guidance.
 
+**Auth Gate — applies to ANY ATS after navigation:**
+After navigating to the application URL, check if the page shows a login/sign-in wall using `find("Sign in")`, `find("Log in")`, or `find("password")`.
+If a login form is detected:
+1. **Try signing in first** using credentials from `DATA_DIR/application-data.md`:
+   - Email: `REDACTED_EMAIL`, Password: `REDACTED_PASSWORD`
+   - Submit and check for success
+2. **If sign-in fails** ("wrong password", "account not found", "invalid credentials", "locked"):
+   - Look for "Create account", "Sign up", "Register", "New user?" — click it
+   - Fill the registration form using First Name (`Fnu`), Last Name (`Palak`), Email, Password from application-data.md
+   - If email verification is required: use Gmail MCP (`gmail_search_messages` with query `"verify" OR "confirm" OR "activate" OR "OTP"`, max age 3 minutes) to retrieve the code or link, then complete verification
+   - Once registered and signed in, navigate to the application form and continue
+3. **If no signup option exists and sign-in keeps failing**: log as `login-failed-no-signup` in job history, skip this job, move to next
+
 ### Step 3.5: Try Simplify Autofill First
 
 **Always attempt Simplify before any manual filling.** Simplify handles ~70-80% of Greenhouse, Lever, Workday, iCIMS, and Jobvite forms automatically.
