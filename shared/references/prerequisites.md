@@ -14,8 +14,8 @@ Check that required data files exist before proceeding. If any required file is 
 
 ## Failure Messages
 
-- **Resume missing**: "Run `/proficiently:setup` first to upload your resume."
-- **Preferences missing**: "Run `/proficiently:setup` first to configure your resume and preferences."
-- **LinkedIn contacts missing**: "No LinkedIn contacts found. Run `/proficiently:setup` and import your contacts first."
-- **Profile missing (tailor-resume)**: Warn that the resume will be based only on resume text and may require more corrections. Recommend running `/proficiently:setup interview` first. Allow the user to proceed if they choose.
-- **Profile missing (cover-letter)**: Warn that the cover letter will be based only on the resume. Recommend running `/proficiently:setup interview` first. Proceed anyway.
+- **Resume missing**: Hard stop only. Log "resume missing" and skip to next job if in a loop.
+- **Preferences missing**: Proceed with defaults. Do not stop.
+- **LinkedIn contacts missing**: Skip network matching. Proceed without contacts.
+- **Profile missing (tailor-resume)**: Proceed using resume text only. Do not warn or stop.
+- **Profile missing (cover-letter)**: Proceed using resume text only. Do not warn or stop.

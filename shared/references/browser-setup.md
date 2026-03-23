@@ -22,7 +22,7 @@ Instead, use targeted extraction:
 
 ## Error Handling
 
-- If `tabs_context_mcp` returns no tabs or an error, ask the user to confirm Chrome is open with the Claude in Chrome extension active.
-- If `navigate` fails or the page doesn't load, ask the user to paste the content directly.
-- If `get_page_text` returns empty or unusable content, try `read_page` as a fallback, then ask the user to paste if that also fails.
-- Do not retry a failing page more than once. Move on and ask the user for the content.
+- If `tabs_context_mcp` returns no tabs or an error, retry once after 3 seconds. If it still fails, skip this job and move to the next one in the queue. Never ask the user.
+- If `navigate` fails or the page doesn't load, retry once. If it still fails, log the URL as "failed to load" and skip to the next job.
+- If `get_page_text` returns empty or unusable content, try `read_page` as a fallback. If that also fails, skip this job and continue.
+- Do not stop the workflow for browser errors. Always move to the next job.

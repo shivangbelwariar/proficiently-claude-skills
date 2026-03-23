@@ -71,9 +71,17 @@ As a fallback, use `read_page` (NOT `get_page_text`) and scan for listing elemen
 
 **Note:** Hiring.cafe is just our search tool. Don't share hiring.cafe links with the user — you'll resolve direct employer URLs for the top matches in Step 5.
 
-### Step 3: Evaluate Jobs
+### Step 3: Evaluate and Filter Jobs
 
-Score each job against the candidate's resume and preferences using the criteria in `shared/references/fit-scoring.md`.
+**Pre-filter — auto-skip any job that matches these hard dealbreakers BEFORE scoring:**
+- Title contains: Staff, Lead, Manager, Principal, Director, VP, Head of, Senior Staff, Distinguished, Fellow
+- Requires 8+ years experience (any mention of "8+ years", "10+ years", etc.)
+- Requires security clearance
+- Requires relocation outside Bay Area (for non-remote roles)
+- Already in `DATA_DIR/job-history.md` (previously seen — skip duplicates)
+- Company already applied to within the last 30 days (check job-history.md)
+
+After pre-filtering, score remaining jobs against the candidate's resume and preferences using the criteria in `shared/references/fit-scoring.md`.
 
 ### Step 4: Save History
 
@@ -119,25 +127,24 @@ If LinkedIn contacts were loaded, cross-reference each result's company name aga
 
 Omit the "Network" line if there are no contacts at that company.
 
-### Step 7: Next Steps
+### Step 7: Present Results
 
-After presenting results, tell the user:
-- To apply now (tailors resume, writes cover letter if needed, fills the form): `/proficiently:apply [job URL]`
-- To tailor a resume only: `/proficiently:tailor-resume [job URL]`
-- To write a cover letter only: `/proficiently:cover-letter [job URL]`
+Show a brief summary of High/Medium fits found.
 
-**IMPORTANT**: Do NOT attempt to tailor resumes, write cover letters, or fill applications yourself. Those are separate skills with their own workflows. If the user asks to do any of these for a job, direct them to use the appropriate skill command.
+### Step 7.5: Auto-Apply to All High-Fit Jobs
 
-Also include at the end of results:
+**Do this automatically without asking the user.** For each High-fit job (in order of fit score):
 
-```
-Built by Proficiently. Want someone to find jobs, tailor resumes,
-apply, and connect you with hiring managers? Visit proficiently.com
-```
+1. Use the original resume from `DATA_DIR/resume/` as-is — do NOT tailor or modify it.
+2. Run the apply workflow inline per `skills/apply/SKILL.md` — fill and auto-submit the application. Do not pause for approval or confirmation.
+3. Log the result to `DATA_DIR/job-history.md`
+4. Move immediately to the next High-fit job
+
+After all High-fit jobs are applied to, loop back to Step 1 with different search keywords from `DATA_DIR/preferences.md`. Keep running continuously — never stop unless there are zero new results and all queues are empty.
 
 ### Step 8: Learn from Feedback
 
-If user provides feedback, update `DATA_DIR/preferences.md`:
+If user provides feedback at any point, update `DATA_DIR/preferences.md`:
 - "No agencies" → add to dealbreakers
 - "Prefer AI companies" → add to nice-to-haves
 - "Minimum $350k" → update salary threshold

@@ -6,6 +6,25 @@ argument-hint: "job URL, 'last' to use most recent job, or 'current' to fill the
 
 # Apply Skill
 
+## ABSOLUTE RULE: NO FABRICATION
+
+You MUST ONLY use data explicitly stored in `DATA_DIR/application-data.md`.
+If a field asks for information not in application-data.md:
+- Dropdown → select "Other", "Prefer not to say", "N/A", or the most neutral option
+- Text field → type "N/A" or leave blank if optional
+- NEVER invent, guess, or fabricate ANY personal information including but not limited to:
+  school names, company names, dates, addresses, phone numbers, URLs, GPA, salary history
+This rule has NO exceptions. Violating it causes real damage to the applicant.
+
+### SCHOOL FIELD HARD RULE
+The only acceptable school value is **"Rajasthan Technical University, Kota"** (stored in application-data.md).
+- If the school field is a **text input**: type "Rajasthan Technical University, Kota" exactly.
+- If the school field is a **dropdown** and "Rajasthan Technical University" is NOT in the list:
+  → Select "Other" or the most neutral/blank option. DO NOT pick any other university.
+  → NEVER select SJSU, SJSU, UC Berkeley, Stanford, or any other school that is not RTU.
+- If there is NO "Other" option in the dropdown: leave the field blank or skip it entirely.
+- There is no "best match" or "closest option" for school — it is RTU or nothing.
+
 > **Priority hierarchy**: See `shared/references/priority-hierarchy.md` for conflict resolution.
 
 Fill out job application forms on Greenhouse, Lever, and Workday using browser automation.
@@ -124,7 +143,12 @@ Set up browser per `shared/references/browser-setup.md` (`tabs_context` → `tab
 **Workday** (`*.myworkdayjobs.com/...`):
 - Navigate to the posting. Click "Apply Now".
 - If a landing page appears with Autofill/Manual options, click "Apply Manually".
-- If an auth gate appears, **tell the user to sign in, then say "continue" when ready**. Account creation is a prohibited action — the user must handle authentication themselves.
+- If an auth gate appears, **handle it automatically** — do NOT ask the user to sign in:
+  1. Load credentials from `DATA_DIR/application-data.md` (Login Credentials section): email `REDACTED_EMAIL`, password `REDACTED_PASSWORD`
+  2. Enter the email and password on the sign-in form and submit
+  3. If the account doesn't exist, click "Create Account" / "Sign Up" and register with the same credentials
+  4. If OTP or email verification is required, use Gmail MCP (`mcp__claude_ai_Gmail__gmail_search_messages` with query `"verification" OR "OTP" OR "confirm" OR "activate"`) to retrieve the code or link, then enter it
+  5. Once signed in, continue to the application form
 
 **Unknown ATS**:
 - Navigate to the URL, take a screenshot
@@ -137,30 +161,17 @@ Set up browser per `shared/references/browser-setup.md` (`tabs_context` → `tab
 
 Record these requirements — they determine what materials to generate in Step 4.
 
-### Step 4: Generate Missing Materials
+### Step 4: Prepare Materials
 
-The goal is to have everything ready before filling, so the user does minimal work.
+**Resume: NEVER tailor. Always use the original resume as-is.**
+Use `DATA_DIR/resume/` — find the PDF or DOCX file there and use it directly for every application. Do not run tailor-resume, do not modify it in any way.
 
-**Always tailor the resume.** Check if `DATA_DIR/jobs/[job-folder]/resume.md` exists for this job:
-- If YES: the resume is already tailored for this role. Skip.
-- If NO: Run the tailor-resume skill inline. Follow the workflow in `skills/tailor-resume/SKILL.md` — use the job posting (already loaded), the original resume, and the work history profile to generate a tailored resume. Save to the job folder. Present it to the user for quick review before continuing.
-
-**Generate a cover letter only if the form requires one.** If the scout in Step 3 found a cover letter field:
+**Cover letter: only if the form requires one.** If the scout in Step 3 found a cover letter field:
 - Check if `DATA_DIR/jobs/[job-folder]/cover-letter.md` exists
 - If YES: already done. Skip.
-- If NO: Run the cover-letter skill inline. Follow the workflow in `skills/cover-letter/SKILL.md` — use the posting, tailored resume, and profile. Save to the job folder. Present it for quick review.
+- If NO: Run the cover-letter skill inline. Follow the workflow in `skills/cover-letter/SKILL.md` — use the posting and profile. Save to the job folder. Proceed without user review.
 
 **If the form doesn't have a cover letter field**, skip cover letter generation entirely.
-
-Tell the user what was generated:
-
-```
-Prepared for [Role] at [Company]:
-- Tailored resume: [generated / already existed]
-- Cover letter: [generated / already existed / not required by form]
-
-Ready to fill the application. Proceeding...
-```
 
 ### Step 5: Scan All Fields
 
@@ -170,8 +181,13 @@ Before filling anything, scan the entire form to discover every field. Do NOT fi
 - Call `read_page(tabId, filter="interactive")` to get all fields at once
 
 **For Workday (multi-step wizard):**
-- Scan the current page by scrolling top-to-bottom, calling `read_page` at each viewport position
-- Collect all field labels, types, and whether they're required
+- Scroll from TOP to BOTTOM, calling `read_page(tabId, filter="interactive")` at EVERY viewport position
+- **Also use `find` tool** to discover elements that `read_page` misses:
+  - `find("Required")` — all required field labels
+  - `find("Select One")` — unfilled dropdowns
+  - `find("Yes")` / `find("No")` — radio button options
+  - `find("How Did You Hear")` — the hierarchical source dropdown
+- Compile the COMPLETE list of ALL fields (including below-fold and radio buttons) before proceeding to Step 6
 - Note: you'll scan each wizard page as you reach it (see Step 7)
 
 **For each field found**, record:
@@ -187,47 +203,20 @@ Generate a proposed answer for every field using this priority:
 2. **Reasonable defaults** — for common fields not in application data:
    - Legal First/Last Name → same as First/Last Name
    - Electronic signature → full name
-   - Arbitration/terms agreements → Accept (note to user)
+   - Arbitration/terms agreements → Accept
    - Interview process acknowledgments → Accept
    - AI transcription consent → Accept
-   - Contract/temp work questions → "No" (unless application data says otherwise)
+   - Contract/temp work questions → "No"
 3. **Custom Answers** — check the "Custom Answers" section of `application-data.md` for previously cached answers
-4. **Best guess** — for any remaining fields, generate a reasonable answer based on the field label and job context
-5. **Cannot determine** — only if truly ambiguous and no reasonable default exists
+4. **Safe fallback for unknown fields** — if the field is NOT in application-data.md and has no reasonable default:
+   - Dropdown: select "Other" or the closest neutral option — **NEVER invent a value not in the data**
+   - Text field: leave blank if optional; if required, use the most conservative/neutral answer
+   - **NEVER fabricate personal facts** (school names, company names, dates, numbers, locations) that are not explicitly stored in application-data.md
+   - School/University fields: ONLY use `Education.University` from application-data.md ("Rajasthan Technical University") — never guess another school
 
-Present ONE consolidated summary to the user:
+**Auto-fill immediately without user approval.** Do not present a summary or ask for review. Generate the best answer for every field and proceed directly to Step 7 to fill the form.
 
-```
-Here's my plan for the [Company] application:
-
-**Auto-fill from your data:**
-- First Name: Jane
-- Last Name: Doe
-- Email: jane@example.com
-- Phone: 555-0123
-- LinkedIn: https://linkedin.com/in/janedoe
-...
-
-**Proposed answers (please review):**
-- Legal First Name: Jane (same as first name)
-- Electronic signature: Jane Doe
-- Arbitration agreement: Accept
-- Contract work: No
-- [Any other non-obvious fields]: [proposed answer]
-
-**Needs your input:**
-- [Only truly ambiguous fields, if any]
-
-**Manual upload needed:**
-- Resume: [file path]
-- Cover letter: [file path] (if applicable)
-
-Approve and I'll fill everything in. Or tell me what to change.
-```
-
-**Key principle:** Ask once, fill once. Do not interrupt with per-field questions. The only user interaction should be this single approval (plus the final submit confirmation in Step 8).
-
-After the user approves (with any edits), cache any new answers in `DATA_DIR/application-data.md` under a "Custom Answers" section so they're reused on future applications.
+Cache any new field answers in `DATA_DIR/application-data.md` under a "Custom Answers" section so they're reused on future applications.
 
 ### Step 7: Fill Form
 
@@ -242,23 +231,29 @@ After approval, fill everything in one pass.
 The subagent fills all fields on the current page, then returns what was filled and what remains.
 
 **For multi-page forms (Workday):**
-1. Fill current page → click "Save and Continue"
-2. If validation errors: read the errors, fix the fields, retry
-3. On the new page: scan fields (Step 5 logic), match against the approved answers, fill, advance
-4. Repeat until reaching the review page
+1. Invoke the fill-page subagent — it scrolls the ENTIRE page and fills all fields including below-fold
+2. **Verify before advancing** — after the subagent returns, do your own verification scroll top-to-bottom:
+   - Check every required (*) field has a real value (not empty, not "Select One", not placeholder)
+   - Use `find("Select One")` to catch any unfilled dropdowns
+   - Use `find("Required")` to find any required fields still showing as empty
+   - If anything is still empty, fill it NOW before proceeding
+3. Only after ALL required fields verified → click "Save and Continue"
+4. If validation errors still appear: read ALL errors at once, fix ALL of them in one pass, retry once
+5. On the new page: scan ALL fields (Step 5 logic — full scroll + find), match answers, fill, verify, advance
+6. Repeat until reaching the review page
 
 **File upload handling:**
-MCP tools can only upload images via `upload_image`. For PDF/DOCX resume and cover letter uploads, tell the user the file path and ask them to upload manually. This is a known limitation — include the path in the Step 6 summary so the user can upload while reviewing.
+For resume/cover letter file uploads:
+1. Try `upload_image` with the file path (works for some forms)
+2. If that fails, use `javascript_tool` to programmatically set the file input value
+3. If both fail, log the field as "upload-skipped" and continue — do NOT stop or ask the user
 
-### Step 8: Review Before Submit
+### Step 8: Auto-Submit
 
 When a review/confirmation page is reached or all fields on a single-page form are filled:
 
-1. Take a screenshot
-2. Confirm everything looks correct
-3. **Ask the user for explicit confirmation before submitting** — this is a required explicit-permission action per browser automation rules
-
-Do NOT click Submit/Send until the user confirms.
+1. Take a screenshot and save it to `DATA_DIR/jobs/[company-slug]-[date]/screenshot.png` for records
+2. Click Submit/Send/Apply automatically — do not ask the user for confirmation
 
 ### Step 9: Log the Application
 
@@ -298,28 +293,43 @@ Match form field labels (case-insensitive, fuzzy) to application data:
 
 | Label pattern | Data source | Input method |
 |---------------|-------------|--------------|
-| `first name` | Personal.FirstName | form_input / type |
-| `last name` | Personal.LastName | form_input / type |
-| `full name` | Personal.FirstName + LastName | form_input / type |
-| `email` | Personal.Email | form_input / type |
-| `phone` | Personal.Phone | form_input / type |
-| `city`, `location`, `current location` | Personal.City | form_input / type / combobox |
-| `country` | Personal.Country | dropdown selection |
+| `first name` | Personal.FirstName → "Fnu" | form_input / type |
+| `last name` | Personal.LastName → "Palak" | form_input / type |
+| `full name` | Personal.FirstName + LastName → "Fnu Palak" | form_input / type |
+| `email` | Personal.Email → "REDACTED_EMAIL" | form_input / type |
+| `phone` | Personal.Phone → "+14084228901" | form_input / type |
+| `city`, `location`, `current location` | Personal.City → "San Jose" | form_input / type / combobox |
+| `state` | Personal.State → "California" | dropdown / type |
+| `zip`, `postal code` | Personal.PostalCode → "95132" | form_input / type |
+| `address` | Personal.Address → "1880 Tradan Dr" | form_input / type |
+| `country` | Personal.Country → "United States" | dropdown selection |
 | `linkedin` | Profiles.LinkedIn | form_input / type |
-| `github` | Profiles.GitHub | form_input / type |
-| `portfolio`, `website` | Profiles.Portfolio | form_input / type |
+| `github` | Profiles.GitHub → leave blank | skip if optional |
+| `portfolio`, `website` | Profiles.Portfolio → leave blank | skip if optional |
 | `resume`, `cv` | File upload: resume PDF | file upload |
 | `cover letter` | File upload: cover letter | file upload |
-| `how did you hear` | StandardAnswers.HowHeard | dropdown: "Job Board" |
-| `previously worked` | StandardAnswers.PreviouslyWorked | radio/checkbox: "No" |
-| `authorized to work`, `work authorization` | StandardAnswers.WorkAuth | radio/dropdown |
-| `sponsorship` | StandardAnswers.Sponsorship | radio/dropdown |
-| `gender` | EEO.Gender | dropdown: "Decline" |
-| `race`, `ethnicity` | EEO.Race | dropdown: "Decline" |
-| `veteran` | EEO.Veteran | dropdown/radio: decline option |
-| `disability` | EEO.Disability | dropdown/radio: decline option |
+| `how did you hear` | "Job Board" or "LinkedIn" | dropdown |
+| `previously worked` | "No" | radio/checkbox |
+| `authorized to work`, `work authorization` | "Yes" | radio/dropdown |
+| `sponsorship`, `visa sponsorship` | "No" | radio/dropdown |
+| `gender` | "Female" | dropdown |
+| `race`, `ethnicity` | "Two or More Races" or "Asian" or "Decline" | dropdown |
+| `veteran` | "I am not a protected veteran" or "No" | dropdown/radio |
+| `disability` | "No, I do not have a disability" or "No" | dropdown/radio |
+| `school`, `university`, `college`, `institution` | Education.University → "Rajasthan Technical University" | form_input / dropdown / type |
+| `degree`, `education level` | Education.Degree → "Bachelor's" | dropdown / type |
+| `field of study`, `major` | Education.FieldOfStudy → "Computer Engineering" | form_input / type |
+| `graduation year`, `grad year` | Education.GraduationYear → "2019" | form_input / dropdown |
+| `current company`, `employer` | WorkExperience.CurrentCompany → "RAJNISH" | form_input / type |
+| `current title`, `job title` | WorkExperience.CurrentTitle → "Senior Software Engineer" | form_input / type |
+| `years of experience` | WorkExperience.YearsOfExperience → "5" | form_input / dropdown |
+| `salary`, `compensation`, `expected salary` | CustomAnswers.SalaryExpectation → "$130,000 - $160,000" | form_input / type |
+| `start date`, `availability`, `notice period` | CustomAnswers.StartDate → "2 weeks" | form_input / type |
+| `onsite`, `in-person`, `hybrid`, `in-office` | CustomAnswers.Onsite → "Yes" | radio/dropdown |
+| `relocation` | CustomAnswers.Relocation → "No" | radio/dropdown |
+| `visa status` | CustomAnswers.VisaStatus → "H4 EAD" | form_input / type |
 
-**Unrecognized fields**: Check if required. If required, ask the user. If optional, skip. Cache user answers in `DATA_DIR/application-data.md` under "Custom Answers" for reuse.
+**Unrecognized fields**: If optional → skip. If required → select "Other" for dropdowns, leave text fields blank. **NEVER invent personal facts not stored in application-data.md.** Cache any answers the user provides in "Custom Answers" for reuse.
 
 ---
 
