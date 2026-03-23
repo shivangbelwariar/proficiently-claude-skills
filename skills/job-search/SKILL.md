@@ -50,11 +50,13 @@ Extract search terms from:
 
 ### Step 2: Browser Search
 
-Use Claude in Chrome MCP tools per `shared/references/browser-setup.md`, navigating to https://hiring.cafe. For each search term, enter the query and apply relevant filters (date posted, location, etc.).
+Use Claude in Chrome MCP tools per `shared/references/browser-setup.md`.
 
-**Extracting results — IMPORTANT:** Do NOT use `get_page_text` on hiring.cafe or any large job listing page. It returns the entire page content and will blow out the context window.
+**Determining the URL to navigate to:**
+- **If `$ARGUMENTS` is empty or not provided:** Read `DATA_DIR/preferences.md`, find `## Default Search URLs > Hiring.cafe`, and navigate to that URL directly. All search filters are already encoded in it — do NOT re-enter any search terms or change any filters.
+- **If `$ARGUMENTS` is provided:** Navigate to `https://hiring.cafe`, enter the search term, and apply filters (date posted, location) manually.
 
-Instead, extract job listings using `javascript_tool` to pull only structured data:
+**Extracting results — IMPORTANT:** Do NOT use `get_page_text` on hiring.cafe. It will blow out the context window. Extract using `javascript_tool` only:
 
 ```javascript
 // Extract visible job listing data from the page
@@ -65,11 +67,22 @@ Array.from(document.querySelectorAll('[class*="job"], [class*="listing"], [class
   .join('\n---\n')
 ```
 
-If that selector doesn't match, take a screenshot to understand the page structure, then write a targeted JS selector for the specific site. The goal is to extract just the listing rows (title, company, location, salary) — never the full page.
+If that selector doesn't match, take a screenshot to understand the page structure, then write a targeted JS selector. The goal is just listing rows (title, company, location, salary) — never the full page.
 
-As a fallback, use `read_page` (NOT `get_page_text`) and scan for listing elements.
+**Pagination — hiring.cafe uses infinite scroll:**
+After extracting the initial visible results, collect more via auto-scroll:
+1. Record the count of jobs collected so far
+2. Scroll to bottom: `computer(action="scroll", coordinate=[760, 400], direction="down", amount=15)`
+3. Wait 2 seconds for new results to load
+4. Extract newly visible listings using the same `javascript_tool` selector
+5. Add any new listings not already collected (deduplicate by title+company)
+6. Repeat steps 2-5 until:
+   - No new listings appear after scrolling (reached end), OR
+   - 200+ total jobs collected (cap — stop here to avoid context overflow)
 
-**Note:** Hiring.cafe is just our search tool. Don't share hiring.cafe links with the user — you'll resolve direct employer URLs for the top matches in Step 5.
+Deduplicate all collected listings by `(company, title)` before proceeding to Step 3.
+
+**Note:** Never show hiring.cafe links to the user — resolve direct employer URLs in Step 5.
 
 ### Step 3: Evaluate and Filter Jobs
 
