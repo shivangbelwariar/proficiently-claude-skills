@@ -131,6 +131,7 @@ Set up browser per `shared/references/browser-setup.md` (`tabs_context` → `tab
 
 **Lever** (`jobs.lever.co/...`):
 - Navigate to the posting URL with `/apply` appended, or navigate to the posting and click "APPLY FOR THIS JOB"
+- **No auth gate** — Lever never requires login. Skip Auth Gate check entirely.
 
 **Greenhouse** (`boards.greenhouse.io/...` or page with `grnhse_iframe`):
 - Navigate to the posting URL
@@ -144,6 +145,7 @@ Set up browser per `shared/references/browser-setup.md` (`tabs_context` → `tab
   });
   ```
 - Navigate to direct form URL: `https://job-boards.greenhouse.io/embed/job_app?for={boardToken}&token={jobToken}`
+- **No auth gate** — Greenhouse never requires login. Skip Auth Gate check entirely.
 
 **Workday** (`*.myworkdayjobs.com/...`):
 - Navigate to the posting. Click "Apply Now".
@@ -183,34 +185,37 @@ If the page shows a sign-in / login form (detected by `find("Sign in")`, `find("
 **Always attempt Simplify before any manual filling.** Simplify handles ~70-80% of Greenhouse, Lever, Workday, iCIMS, and Jobvite forms automatically.
 
 1. Wait 2 seconds for the page to fully load
-2. **Zoom into the bottom-right corner** to check for the Simplify icon:
+2. **Zoom into the bottom-right corner** to check for Simplify:
    ```
    computer(action="zoom", region=[1100, 500, 1312, 768])
    ```
-   The Simplify icon is a small gray/silver rounded square with 3-4 horizontal white stripes (stacked lines).
-3. **If the Simplify icon is visible:**
-   - Click it to trigger autofill
-   - Wait 3 seconds for Simplify to fill the form
-   - Take a screenshot to see what was filled
-   - **Correct these fields immediately after Simplify fills** (Simplify often gets them wrong):
-     - **School/University**: Simplify may fill wrong school — overwrite with "Rajasthan Technical University, Kota" (or "Other" if dropdown)
-     - **Field of Study**: must be "Computer Engineering" exactly
-     - **Graduation Year**: must be 2019
-   - **Then verify REQUIRED (*) fields only** — do not touch optional fields:
+3. **Determine Simplify state:**
+   - **Panel already open** (shows "Autofill this page" button visible): click that button directly — do NOT click the icon again
+   - **Only the icon visible** (small gray/silver square with horizontal stripes): click the icon to open the panel, then click "Autofill this page"
+   - **Neither visible**: Simplify is not active — skip to manual Steps 5-7
+4. **After clicking Autofill:** wait 4 seconds, then check ONCE with `find("complete")`:
+   - **If "Autofill complete!" found** → Simplify succeeded. Continue to step 5.
+   - **If not found** → Simplify failed — continue with manual Steps 5-7
+5. **After successful Simplify fill:**
+   - **Correct these fields** (Simplify often gets them wrong):
+     - **School/University** → overwrite with "Rajasthan Technical University, Kota" (or "Other" if dropdown)
+     - **Field of Study** → overwrite with "Computer Engineering"
+     - **Graduation Year** → overwrite with "2019"
+   - **Verify REQUIRED (*) fields only** — do not touch optional fields:
      - Use `find("*")` and `find("Required")` to get the required-field inventory
      - Use `find("Select One")` to catch unfilled required dropdowns
      - Scroll top-to-bottom checking every required (*) field has a real value
      - Fill any still-empty required (*) fields using `application-data.md` — skip optional ones
    - Skip to **Step 7**, passing `simplify_already_filled: true` to the fill-page subagent
-4. **If no Simplify icon appears after 3 seconds:**
-   - Simplify doesn't support this form — continue with manual Steps 5-7 below
 
-**Scout the form.** Once on the application form, do a quick scan (`read_page(filter="interactive")` or scroll through for Workday) to determine:
-- Does the form have a **resume/CV upload** field?
-- Does the form have a **cover letter** upload or text field?
-- Are there any **unusual required fields** that need special attention?
-
-Record these requirements — they determine what materials to generate in Step 4.
+**Scout the form** — single JS call (no read_page needed):
+```javascript
+({
+  hasResume: !!document.querySelector('input[type="file"]'),
+  hasCoverLetter: [...document.querySelectorAll('label,textarea,input')].some(el => /cover.?letter/i.test(el.innerText || el.placeholder || el.name || ''))
+})
+```
+Use this result to determine what materials to generate in Step 4.
 
 ### Step 4: Prepare Materials
 
@@ -307,8 +312,7 @@ For resume/cover letter file uploads:
 
 When a review/confirmation page is reached or all fields on a single-page form are filled:
 
-1. Take a screenshot and save it to `DATA_DIR/jobs/[company-slug]-[date]/screenshot.png` for records
-2. Click Submit/Send/Apply automatically — do not ask the user for confirmation
+1. Click Submit/Send/Apply automatically — do not ask the user for confirmation
 
 ### Step 9: Log the Application
 
