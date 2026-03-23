@@ -175,7 +175,7 @@ If the page shows a sign-in / login form (detected by `find("Sign in")`, `find("
 2. **If login succeeds**: continue to the application form
 3. **If login fails** ("wrong password", "account not found", "invalid credentials", "locked"):
    - Look for "Create account", "Sign up", "Register", "New user?" — click it
-   - Fill registration: First Name `Fnu`, Last Name `Palak`, Email `REDACTED_EMAIL`, Password `REDACTED_PASSWORD`
+   - Fill registration using fields from `DATA_DIR/application-data.md`: First Name, Last Name, Email, Password (Login Credentials section)
    - If email verification required: use Gmail MCP (`gmail_search_messages` query `"verify" OR "confirm" OR "activate" OR "OTP"`, max age 5 minutes) → get link or code → complete verification
    - Once signed in, continue to the application form
 4. **If no signup option and login keeps failing**: log as `login-failed-no-signup`, skip this job, move to next
