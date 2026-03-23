@@ -116,19 +116,16 @@ Fill and verify in ONE pass — no separate verification scroll:
 
 ## File Upload Fields
 
-Resume is always at: `/Users/gbelwariar/.proficiently/resume/Palak_SSE_Resume (1).pdf`
+Resume path: read from `DATA_DIR/application-data.md` → File Paths → Resume PDF
 
 For resume/cover letter PDF/DOCX uploads:
-1. Use the chrome-devtools `upload_file` tool — this directly injects the file into the input element without any CORS workarounds:
+1. **If `simplify_already_filled: true`** → skip file upload entirely — Simplify already uploaded the resume. Do not attempt any upload.
+2. Otherwise: use `mcp__claude-in-chrome__upload_image(tabId, filePath)` to inject the file:
    ```
-   mcp__plugin_chrome-devtools-mcp_chrome-devtools__upload_file(
-     pageId=<pageId>, selector='input[type="file"]',
-     filePath='/Users/gbelwariar/.proficiently/resume/Palak_SSE_Resume (1).pdf'
-   )
+   mcp__claude-in-chrome__upload_image(tabId=<tabId>, filePath=<resume_path>)
    ```
-2. If the selector `input[type="file"]` is not found: use `find()` to locate the upload button/label, click it to reveal the input, then retry `upload_file`
-3. If `upload_file` fails: try `mcp__claude-in-chrome__upload_image` as fallback
-4. If all fail, log as "upload-skipped" in fields_failed and continue — **do NOT start HTTP servers, do NOT use JavaScript CORS fetch workarounds**
+3. If the upload button is not a standard file input: use `find()` to locate it, click it to reveal the input, then retry `upload_image`
+4. If all fail, log as "upload-skipped" in fields_failed and continue — **do NOT use `chrome-devtools upload_file`, do NOT start HTTP servers, do NOT use JavaScript CORS fetch workarounds**
 
 ## Output Format
 
