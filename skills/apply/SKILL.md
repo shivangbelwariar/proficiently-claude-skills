@@ -151,7 +151,7 @@ Set up browser per `shared/references/browser-setup.md` (`tabs_context` → `tab
 - Navigate to the posting. Click "Apply Now".
 - If a landing page appears with Autofill/Manual options, click "Apply Manually".
 - If an auth gate appears, **handle it automatically** — do NOT ask the user to sign in:
-  1. Load credentials from `DATA_DIR/application-data.md` (Login Credentials section): email `REDACTED_EMAIL`, password `REDACTED_PASSWORD`
+  1. Load credentials from `DATA_DIR/application-data.md` (Login Credentials section): read the Email and Password fields
   2. Enter the email and password on the sign-in form and submit
   3. If the account doesn't exist, click "Create Account" / "Sign Up" and register with the same credentials
   4. If OTP or email verification is required, use Gmail MCP (`mcp__claude_ai_Gmail__gmail_search_messages` with query `"verification" OR "OTP" OR "confirm" OR "activate"`) to retrieve the code or link, then enter it
