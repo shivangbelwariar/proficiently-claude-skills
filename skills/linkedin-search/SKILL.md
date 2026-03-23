@@ -135,37 +135,36 @@ For each High-fit job:
 
 For **Medium-fit** jobs: attempt to resolve employer URL but don't save full posting.
 
-### Step 6: Present Results
+### Step 6: Auto-Apply to All High-Fit Jobs
 
-Show only NEW High/Medium fits not already in history.
+**Do this automatically without asking the user. Do NOT present results first and wait — start applying immediately.**
+
+For each High-fit job with a resolved employer URL:
+
+1. Use the original resume from `DATA_DIR/resume/` as-is — never tailor
+2. Run the apply workflow per `skills/apply/SKILL.md` — fill and auto-submit. Do not pause for approval or confirmation between jobs.
+3. Log result to `DATA_DIR/job-history.md`
+4. Move immediately to the next job
+
+After all High-fit jobs are processed, loop back to Step 1 with different search keywords from `preferences.md`. Keep running continuously — never stop unless there are zero new results and all queues are empty.
+
+### Step 7: Summary (after all applications done)
+
+Only after ALL high-fit jobs are applied to, show a brief summary. Do not wait for user response.
 
 ```markdown
-## LinkedIn Results for [DATE]
+## LinkedIn Session Summary for [DATE]
 
-### 1. [Title] at [Company]
-- **Fit**: High
-- **Salary**: $XXXk (if available)
-- **Location**: Remote / San Jose, CA
-- **Why**: [reason from fit-scoring]
-- **Apply**: [employer careers page URL]
-- **Network**: You know [First Last] ([Position]) at [Company]  ← if LinkedIn contacts loaded
+### Applied ([N] jobs)
+| Title | Company | Location | Salary | Result |
+|-------|---------|----------|--------|--------|
+| ... | ... | ... | ... | Submitted / Skipped (Easy Apply only) |
 ```
 
 For Easy Apply-only jobs that were skipped, show a brief note:
 ```
 Skipped (Easy Apply only): X jobs — [Company1], [Company2]...
 ```
-
-### Step 7.5: Auto-Apply to All High-Fit Jobs
-
-**Do this automatically without asking the user.** For each High-fit job with a resolved employer URL:
-
-1. Use the original resume from `DATA_DIR/resume/` as-is — never tailor
-2. Run the apply workflow per `skills/apply/SKILL.md`
-3. Log result to `DATA_DIR/job-history.md`
-4. Move immediately to the next job
-
-After all High-fit jobs are processed, loop back to Step 1 with different search keywords from `preferences.md`. Keep running continuously.
 
 ### Step 8: Learn from Feedback
 

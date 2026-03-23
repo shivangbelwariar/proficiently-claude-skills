@@ -120,40 +120,35 @@ For **Medium-fit** jobs, try to resolve the employer URL but don't save the full
 
 If you can't resolve the direct link for a job, note the company name so the user can find it themselves. Never show hiring.cafe URLs to the user.
 
-### Step 6: Present Results
+### Step 6: Auto-Apply to All High-Fit Jobs
 
-Show only NEW High/Medium fits not in previous history.
+**Do this automatically without asking the user. Do NOT present results first and wait — start applying immediately.**
 
-If LinkedIn contacts were loaded, cross-reference each result's company name against the "Company" column in the CSV. Use fuzzy matching (e.g. "Google" matches "Google LLC", "Alphabet/Google"). If there's a match, include the contact's name and title.
-
-```markdown
-## Top Matches for [DATE]
-
-### 1. [Title] at [Company]
-- **Fit**: High
-- **Salary**: $XXXk
-- **Location**: Remote
-- **Why**: [reason]
-- **Network**: You know [First Last] ([Position]) at [Company]
-- **Apply**: [direct employer URL]
-```
-
-Omit the "Network" line if there are no contacts at that company.
-
-### Step 7: Present Results
-
-Show a brief summary of High/Medium fits found.
-
-### Step 7.5: Auto-Apply to All High-Fit Jobs
-
-**Do this automatically without asking the user.** For each High-fit job (in order of fit score):
+For each High-fit job (in order of fit score):
 
 1. Use the original resume from `DATA_DIR/resume/` as-is — do NOT tailor or modify it.
-2. Run the apply workflow inline per `skills/apply/SKILL.md` — fill and auto-submit the application. Do not pause for approval or confirmation.
+2. Run the apply workflow inline per `skills/apply/SKILL.md` — fill and auto-submit the application. Do not pause for approval or confirmation between jobs.
 3. Log the result to `DATA_DIR/job-history.md`
 4. Move immediately to the next High-fit job
 
 After all High-fit jobs are applied to, loop back to Step 1 with different search keywords from `DATA_DIR/preferences.md`. Keep running continuously — never stop unless there are zero new results and all queues are empty.
+
+### Step 7: Summary (after all applications done)
+
+Only after ALL high-fit jobs are applied to, show a brief summary of what was done. Do not wait for user response.
+
+Show only NEW High/Medium fits processed in this session.
+
+If LinkedIn contacts were loaded, cross-reference each result's company name against the "Company" column in the CSV. Use fuzzy matching (e.g. "Google" matches "Google LLC", "Alphabet/Google"). If there's a match, include the contact's name and title.
+
+```markdown
+## Session Summary for [DATE]
+
+### Applied ([N] jobs)
+| Title | Company | Location | Salary | Result |
+|-------|---------|----------|--------|--------|
+| ... | ... | ... | ... | Submitted / Skipped |
+```
 
 ### Step 8: Learn from Feedback
 
