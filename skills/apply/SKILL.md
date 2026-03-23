@@ -171,7 +171,7 @@ Set up browser per `shared/references/browser-setup.md` (`tabs_context` → `tab
 If the page shows a sign-in / login form (detected by `find("Sign in")`, `find("Log in")`, or `find("password")`):
 
 **ALWAYS try login first** — an account may already exist from a previous application:
-1. Enter email `REDACTED_EMAIL` and password `REDACTED_PASSWORD` and submit
+1. Read credentials from `DATA_DIR/application-data.md` (Login Credentials section) and enter email + password and submit
 2. **If login succeeds**: continue to the application form
 3. **If login fails** ("wrong password", "account not found", "invalid credentials", "locked"):
    - Look for "Create account", "Sign up", "Register", "New user?" — click it
