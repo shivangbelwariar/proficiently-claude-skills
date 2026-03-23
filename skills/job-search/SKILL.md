@@ -187,8 +187,8 @@ The pipeline has two parts running simultaneously:
 ---
 
 **Apply pool — start after queue has ≥5 pending rows:**
-1. Open 5 tabs, navigate each to first 5 `pending` employer URLs, mark them `claimed` in queue
-2. Dispatch apply agent for each tab (`run_in_background: true`): Tab ID, Employer URL, Resume `/Users/gbelwariar/.proficiently/resume/Palak_SSE_Resume (1).pdf`, workflow per `skills/apply/SKILL.md` with `tab:<tabId>`
+1. Open 5 tabs using `mcp__claude-in-chrome__tabs_create_mcp(url)` — NEVER use `chrome-devtools new_page` (wrong Chrome window). Navigate each to first 5 `pending` employer URLs. Mark them `claimed` in queue.
+2. Dispatch apply agent for each tab (`run_in_background: true`): Tab ID, Employer URL, resume path from `DATA_DIR/application-data.md`, workflow per `skills/apply/SKILL.md` with `tab:<tabId>`
 
 **Sliding window loop:**
 - When any agent completes:
