@@ -74,7 +74,7 @@ JSON.stringify({
 6. Review
 
 **Authentication**: Workday requires sign-in before the wizard starts. Handle this automatically:
-1. Load credentials from `DATA_DIR/application-data.md` (Login Credentials section): email `REDACTED_EMAIL`, password `REDACTED_PASSWORD`
+1. Load credentials from `DATA_DIR/application-data.md` (Login Credentials section): email `palakfnu10@gmail.com`, password `Mayank@2026`
 2. Try signing in with those credentials on the Workday login page
 3. If the account doesn't exist, create a new Workday account using the same email and password
 4. If email verification or OTP is required, use Gmail MCP tools (`mcp__claude_ai_Gmail__gmail_search_messages` with query `"verification" OR "OTP" OR "confirm"`) to find the code/link and complete verification

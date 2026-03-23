@@ -72,11 +72,6 @@ Parse `$ARGUMENTS`:
 - Skip navigation — will use the current browser tab as-is
 - Match the tab's URL against saved job folders to load context if possible
 
-**If "tab:\<tabId\>" (called from parallel batch):**
-- Skip navigation — the tab is already open and navigated to the employer URL
-- Use the provided tab ID directly for all browser tool calls
-- Do not call `tabs_context_mcp` or `tabs_create_mcp`
-
 Report what's loaded:
 
 ```
@@ -125,15 +120,12 @@ If it does NOT exist:
 
 Set up browser per `shared/references/browser-setup.md` (`tabs_context` → `tabs_create` → `navigate`).
 
-**Tab creation rule**: ALWAYS use `mcp__claude-in-chrome__tabs_create_mcp(url)`. NEVER use `mcp__plugin_chrome-devtools-mcp_chrome-devtools__new_page` — it opens in the wrong Chrome window (no Simplify, no logins).
-
 **If `$ARGUMENTS` is "current"**: Skip navigation. Call `tabs_context_mcp` to get the active tab.
 
 **Otherwise**, detect ATS type from URL patterns (see `shared/references/ats-patterns.md`) and navigate accordingly:
 
 **Lever** (`jobs.lever.co/...`):
 - Navigate to the posting URL with `/apply` appended, or navigate to the posting and click "APPLY FOR THIS JOB"
-- **No auth gate** — Lever never requires login. Skip Auth Gate check entirely.
 
 **Greenhouse** (`boards.greenhouse.io/...` or page with `grnhse_iframe`):
 - Navigate to the posting URL
@@ -147,94 +139,82 @@ Set up browser per `shared/references/browser-setup.md` (`tabs_context` → `tab
   });
   ```
 - Navigate to direct form URL: `https://job-boards.greenhouse.io/embed/job_app?for={boardToken}&token={jobToken}`
-- **No auth gate** — Greenhouse never requires login. Skip Auth Gate check entirely.
 
 **Workday** (`*.myworkdayjobs.com/...`):
 - Navigate to the posting. Click "Apply Now".
 - If a landing page appears with Autofill/Manual options, click "Apply Manually".
 - If an auth gate appears, **handle it automatically** — do NOT ask the user to sign in:
-  1. Load credentials from `DATA_DIR/application-data.md` (Login Credentials section): read the Email and Password fields
+  1. Load credentials from `DATA_DIR/application-data.md` (Login Credentials section): email `palakfnu10@gmail.com`, password `Mayank@2026`
   2. Enter the email and password on the sign-in form and submit
   3. If the account doesn't exist, click "Create Account" / "Sign Up" and register with the same credentials
   4. If OTP or email verification is required, use Gmail MCP (`mcp__claude_ai_Gmail__gmail_search_messages` with query `"verification" OR "OTP" OR "confirm" OR "activate"`) to retrieve the code or link, then enter it
   5. Once signed in, continue to the application form
 
-**iCIMS, Jobvite, SmartRecruiters, Taleo, or any other ATS**:
-- Navigate to the posting and click "Apply" / "Apply Now" / "Apply for this Job"
-- Handle any auth gate automatically (see Auth Gate block below) — NEVER skip a job just because the ATS type is unfamiliar
-- Fill the form using `form_input` / `computer` clicks — treat it like Workday if multi-step
-
 **Unknown ATS**:
-- Navigate to the URL, take a screenshot to understand the page
-- Attempt to fill it — try `read_page(filter="interactive")`, then `form_input` or `computer` clicks
-- Only ask the user if you hit a CAPTCHA or truly unresolvable blocker — do NOT skip just because the ATS is unfamiliar
-
-**Auth Gate — applies to ANY ATS after navigation:**
-If the page shows a sign-in / login form (detected by `find("Sign in")`, `find("Log in")`, or `find("password")`):
-
-**ALWAYS try login first** — an account may already exist from a previous application:
-1. Read credentials from `DATA_DIR/application-data.md` (Login Credentials section) and enter email + password and submit
-2. **If login succeeds**: continue to the application form
-3. **If login fails** ("wrong password", "account not found", "invalid credentials", "locked"):
-   - Look for "Create account", "Sign up", "Register", "New user?" — click it
-   - Fill registration using fields from `DATA_DIR/application-data.md`: First Name, Last Name, Email, Password (Login Credentials section)
-   - If email verification required: use Gmail MCP (`gmail_search_messages` query `"verify" OR "confirm" OR "activate" OR "OTP"`, max age 5 minutes) → get link or code → complete verification
-   - Once signed in, continue to the application form
-4. **If no signup option and login keeps failing**: log as `login-failed-no-signup`, skip this job, move to next
+- Navigate to the URL, take a screenshot
+- Attempt to identify the form. If unrecognizable, tell the user and ask for guidance.
 
 ### Step 3.5: Try Simplify Autofill First
 
 **Always attempt Simplify before any manual filling.** Simplify handles ~70-80% of Greenhouse, Lever, Workday, iCIMS, and Jobvite forms automatically.
 
 1. Wait 2 seconds for the page to fully load
-2. **Zoom into the bottom-right corner** to check for Simplify:
+2. **Zoom into the bottom-right corner** to check for the Simplify icon:
    ```
    computer(action="zoom", region=[1100, 500, 1312, 768])
    ```
-3. **Determine Simplify state:**
-   - **Panel already open** (shows "Autofill this page" button visible): click that button directly — do NOT click the icon again
-   - **Only the icon visible** (small gray/silver square with horizontal stripes): click the icon to open the panel, then click "Autofill this page"
-   - **Neither visible**: Simplify is not active — skip to manual Steps 5-7
-4. **After clicking Autofill:** wait 4 seconds, then check ONCE with `find("complete")`:
-   - **If "Autofill complete!" found** → Simplify succeeded. Continue to step 5.
-   - **If not found** → Simplify failed — continue with manual Steps 5-7
-5. **After successful Simplify fill:**
-   - **Correct these fields** (Simplify often gets them wrong):
-     - **School/University** → overwrite with "Rajasthan Technical University, Kota" (or "Other" if dropdown)
-     - **Field of Study** → overwrite with "Computer Engineering"
-     - **Graduation Year** → overwrite with "2019"
-   - **Verify REQUIRED (*) fields only** — do not touch optional fields:
+   The Simplify icon is a small gray/silver rounded square with 3-4 horizontal white stripes (stacked lines).
+3. **If the Simplify icon is visible:**
+   - Click it to trigger autofill
+   - Wait 3 seconds for Simplify to fill the form
+   - Take a screenshot to see what was filled
+   - **Correct these fields immediately after Simplify fills** (Simplify often gets them wrong):
+     - **School/University**: Simplify may fill wrong school — overwrite with "Rajasthan Technical University, Kota" (or "Other" if dropdown)
+     - **Field of Study**: must be "Computer Engineering" exactly
+     - **Graduation Year**: must be 2019
+   - **Then verify REQUIRED (*) fields only** — do not touch optional fields:
      - Use `find("*")` and `find("Required")` to get the required-field inventory
      - Use `find("Select One")` to catch unfilled required dropdowns
      - Scroll top-to-bottom checking every required (*) field has a real value
      - Fill any still-empty required (*) fields using `application-data.md` — skip optional ones
    - Skip to **Step 7**, passing `simplify_already_filled: true` to the fill-page subagent
+4. **If no Simplify icon appears after 3 seconds:**
+   - Simplify doesn't support this form — continue with manual Steps 5-7 below
+
+**Scout the form.** Once on the application form, do a quick scan (`read_page(filter="interactive")` or scroll through for Workday) to determine:
+- Does the form have a **resume/CV upload** field?
+- Does the form have a **cover letter** upload or text field?
+- Are there any **unusual required fields** that need special attention?
+
+Record these requirements — they determine what materials to generate in Step 4.
 
 ### Step 4: Prepare Materials
 
-**Run this single combined JS call** — detects file fields AND required fields in one shot:
-```javascript
-({
-  hasResume: !!document.querySelector('input[type="file"]'),
-  hasCoverLetter: [...document.querySelectorAll('label,textarea,input')].some(el => /cover.?letter/i.test(el.innerText || el.placeholder || el.name || '')),
-  requiredFields: Array.from(document.querySelectorAll('label,[aria-required="true"],[required]'))
-    .filter(el => el.innerText?.includes('*') || el.getAttribute('aria-required')==='true' || el.hasAttribute('required'))
-    .map(el => ({ label: el.innerText?.replace(/\*/g,'').trim(), ref: el.htmlFor||el.id||'' }))
-    .filter(f => f.label)
-})
-```
-Also run `find("*")` and `find("Select One")` as backup catchers for radio buttons and Workday dropdowns the JS misses.
-
 **Resume: NEVER tailor. Always use the original resume as-is.**
-Resume is hardcoded at: `/Users/gbelwariar/.proficiently/resume/Palak_SSE_Resume (1).pdf` — use this path directly.
+Use `DATA_DIR/resume/` — find the PDF or DOCX file there and use it directly for every application. Do not run tailor-resume, do not modify it in any way.
 
-**Cover letter: only if `hasCoverLetter` was true.** Check if `DATA_DIR/jobs/[job-folder]/cover-letter.md` exists — if not, run the cover-letter skill inline and save it. Skip entirely if no cover letter field found.
+**Cover letter: only if the form requires one.** If the scout in Step 3 found a cover letter field:
+- Check if `DATA_DIR/jobs/[job-folder]/cover-letter.md` exists
+- If YES: already done. Skip.
+- If NO: Run the cover-letter skill inline. Follow the workflow in `skills/cover-letter/SKILL.md` — use the posting and profile. Save to the job folder. Proceed without user review.
+
+**If the form doesn't have a cover letter field**, skip cover letter generation entirely.
 
 ### Step 5: Build Required-Field Inventory
 
-The combined JS in Step 4 already returned `requiredFields`. Use that as the base inventory.
+Before filling anything, identify **only the required (*) fields**. Optional fields are ignored entirely — do not add them to the filling list.
 
-**For Workday (multi-page):** scroll TOP to BOTTOM running the combined JS at each viewport — required fields may be below the fold. Merge results across viewports. Use `find("Yes")` / `find("No")` to find required radio buttons invisible to JS.
+**Run this JS to get required fields:**
+```javascript
+Array.from(document.querySelectorAll('label, [aria-required="true"], [required]'))
+  .filter(el => el.innerText?.includes('*') || el.getAttribute('aria-required') === 'true' || el.hasAttribute('required'))
+  .map(el => ({ label: el.innerText?.replace(/\*/g,'').trim(), ref: el.htmlFor || el.id || '' }))
+  .filter(f => f.label)
+```
+
+Also run `find("*")`, `find("Required")`, `find("Select One")` to catch anything the JS misses (especially radio buttons and Workday dropdowns).
+
+**For Workday (multi-page):** scroll TOP to BOTTOM running the JS at each viewport — required fields may be below the fold. Use `find("Yes")` / `find("No")` to find required radio buttons invisible to JS.
 
 **Result: a complete required-field inventory** — every field that must be filled before submission. This is the ONLY list used in Step 6.
 
@@ -293,17 +273,17 @@ The subagent fills all fields on the current page, then returns what was filled 
 6. Repeat until reaching the review page
 
 **File upload handling:**
-Resume path: read from `DATA_DIR/application-data.md` → File Paths → Resume PDF
 For resume/cover letter file uploads:
-1. If `simplify_already_filled: true` → **skip file upload entirely** — Simplify already uploaded the resume
-2. Otherwise: use `mcp__claude-in-chrome__upload_image(tabId, filePath)` with the resume path
-3. If that fails, log as "upload-skipped" — do NOT use `chrome-devtools upload_file`, do NOT start HTTP servers, do NOT use JavaScript CORS workarounds
+1. Try `upload_image` with the file path (works for some forms)
+2. If that fails, use `javascript_tool` to programmatically set the file input value
+3. If both fail, log the field as "upload-skipped" and continue — do NOT stop or ask the user
 
 ### Step 8: Auto-Submit
 
 When a review/confirmation page is reached or all fields on a single-page form are filled:
 
-1. Click Submit/Send/Apply automatically — do not ask the user for confirmation
+1. Take a screenshot and save it to `DATA_DIR/jobs/[company-slug]-[date]/screenshot.png` for records
+2. Click Submit/Send/Apply automatically — do not ask the user for confirmation
 
 ### Step 9: Log the Application
 
@@ -321,7 +301,6 @@ Create `DATA_DIR/jobs/[company-slug]-[date]/applied.md`:
 ```
 
 Update `DATA_DIR/job-history.md` — find the entry for this job and append the application status and date.
-
 
 Present to user:
 
@@ -347,12 +326,12 @@ Match form field labels (case-insensitive, fuzzy) to application data:
 | `first name` | Personal.FirstName → "Fnu" | form_input / type |
 | `last name` | Personal.LastName → "Palak" | form_input / type |
 | `full name` | Personal.FirstName + LastName → "Fnu Palak" | form_input / type |
-| `email` | Personal.Email (from application-data.md) | form_input / type |
-| `phone` | Personal.Phone (from application-data.md) | form_input / type |
-| `city`, `location`, `current location` | Personal.City (from application-data.md) | form_input / type / combobox |
-| `state` | Personal.State (from application-data.md) | dropdown / type |
-| `zip`, `postal code` | Personal.PostalCode (from application-data.md) | form_input / type |
-| `address` | Personal.Address (from application-data.md) | form_input / type |
+| `email` | Personal.Email → "palakfnu10@gmail.com" | form_input / type |
+| `phone` | Personal.Phone → "+14084228901" | form_input / type |
+| `city`, `location`, `current location` | Personal.City → "San Jose" | form_input / type / combobox |
+| `state` | Personal.State → "California" | dropdown / type |
+| `zip`, `postal code` | Personal.PostalCode → "95132" | form_input / type |
+| `address` | Personal.Address → "1880 Tradan Dr" | form_input / type |
 | `country` | Personal.Country → "United States" | dropdown selection |
 | `linkedin` | Profiles.LinkedIn | form_input / type |
 | `github` | Profiles.GitHub → leave blank | skip if optional |

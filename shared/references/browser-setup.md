@@ -2,15 +2,6 @@
 
 Standard sequence for skills that use Claude in Chrome MCP tools to fetch web pages.
 
-## CRITICAL: NEVER Use chrome-devtools to Create Tabs
-
-**NEVER use `mcp__plugin_chrome-devtools-mcp_chrome-devtools__new_page`** to create application tabs — this opens in a separate automated Chrome with no user profile, no Simplify, no logins.
-
-**NEVER use `open -a "Google Chrome" URL`** — unreliable, targets whichever Chrome process macOS considers frontmost (usually the automated one).
-
-**For ALL tab creation: use `mcp__claude-in-chrome__tabs_create_mcp(url)` ONLY.**
-This is the ONLY tool that opens tabs in the user's real Chrome (with Simplify extension + login sessions).
-
 ## Tab Setup
 
 ```
