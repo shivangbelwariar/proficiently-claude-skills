@@ -56,27 +56,30 @@ Use Claude in Chrome MCP tools per `shared/references/browser-setup.md`.
 - **If `$ARGUMENTS` is empty or not provided:** Read `DATA_DIR/preferences.md`, find `## Default Search URLs > Hiring.cafe`, and navigate to that URL directly. All search filters are already encoded in it — do NOT re-enter any search terms or change any filters.
 - **If `$ARGUMENTS` is provided:** Navigate to `https://hiring.cafe`, enter the search term, and apply filters (date posted, location) manually.
 
-**Extracting results — IMPORTANT:** Do NOT use `get_page_text` on hiring.cafe. It will blow out the context window. Extract using `javascript_tool` only:
+**Extracting results — IMPORTANT:** Do NOT use `get_page_text` on hiring.cafe. Extract using `javascript_tool` only, capturing both text AND the employer/apply URL from each card:
 
 ```javascript
-// Extract visible job listing data from the page
+// Extract job cards with text + apply link href
 Array.from(document.querySelectorAll('[class*="job"], [class*="listing"], [class*="card"], tr, [role="listitem"]'))
   .slice(0, 50)
-  .map(el => el.innerText.trim())
-  .filter(t => t.length > 20 && t.length < 500)
-  .join('\n---\n')
+  .map(el => {
+    const link = el.querySelector('a[href*="://"], a[href*="/jobs/"], a[href*="/apply"]');
+    return { text: el.innerText.trim().slice(0, 300), href: link?.href || '' };
+  })
+  .filter(j => j.text.length > 20)
 ```
 
-If that selector doesn't match, take a screenshot to understand the page structure, then write a targeted JS selector. The goal is just listing rows (title, company, location, salary) — never the full page.
+If that selector doesn't match, take a screenshot to understand the page structure, then write a targeted JS selector.
 
 **Pagination — hiring.cafe uses infinite scroll:**
 After extracting the initial visible results, collect more via auto-scroll:
 1. Record the count of jobs collected so far
 2. Scroll to bottom: `computer(action="scroll", coordinate=[760, 400], direction="down", amount=15)`
-3. Wait 2 seconds for new results to load
+3. Wait **1 second** for new results to load
 4. Extract newly visible listings using the same `javascript_tool` selector
-5. Add any new listings not already collected (deduplicate by title+company)
-6. Repeat steps 2-5 until:
+5. **Immediately drop** any job whose title contains: Staff, Lead, Manager, Principal, Director, VP, Head of, Senior Staff, Distinguished, Fellow — don't accumulate dealbreakers
+6. Add remaining new listings not already collected (deduplicate by title+company)
+7. Repeat steps 2-6 until:
    - No new listings appear after scrolling (reached end), OR
    - 200+ total jobs collected (cap — stop here to avoid context overflow)
 
@@ -94,7 +97,12 @@ Deduplicate all collected listings by `(company, title)` before proceeding to St
 - Already in `DATA_DIR/job-history.md` (previously seen — skip duplicates)
 - Company already applied to within the last 30 days (check job-history.md)
 
-After pre-filtering, score remaining jobs against the candidate's resume and preferences using the criteria in `shared/references/fit-scoring.md`.
+After pre-filtering, score remaining jobs using the `scripts/evaluate-jobs.md` subagent. Pass it:
+- The candidate profile (from resume + preferences)
+- The full batch of pre-filtered job listings
+- The fit-scoring criteria from `shared/references/fit-scoring.md`
+
+The subagent returns a scored JSON array. Use that to split jobs into High/Medium/Low/Skip.
 
 ### Step 4: Save History
 
@@ -110,15 +118,19 @@ Append ALL jobs to `DATA_DIR/job-history.md`:
 
 ### Step 5: Resolve Employer URLs & Save Top Postings
 
-For each **High-fit** job:
-1. Click through the hiring.cafe listing to reach the actual employer careers page
-2. Capture the direct employer URL for the job posting
-3. Extract the job description using `javascript_tool` to pull the posting content (e.g. `document.querySelector('[class*="description"], [class*="content"], article, main')?.innerText`). Do NOT use `get_page_text` — employer pages often have huge footers, navs, and related listings that bloat the output and can blow out the context window.
-4. Save to `DATA_DIR/jobs/[company-slug]-[date]/posting.md` with the employer URL at the top
+**Fast path — use URL already captured in Step 2:**
+For each High-fit job, check if `href` was captured during extraction:
+- **If `href` is an employer/ATS URL** (contains `greenhouse.io`, `lever.co`, `workday`, `ashbyhq`, `workable`, `smartrecruiters`, or any non-hiring.cafe domain): use it directly — no navigation needed
+- **If `href` is empty or points to hiring.cafe**: navigate to the hiring.cafe listing and click through to get the employer URL
 
-For **Medium-fit** jobs, try to resolve the employer URL but don't save the full posting.
+For each **High-fit** job with a resolved employer URL:
+1. Navigate to the employer URL
+2. Extract the job description via `javascript_tool`: `document.querySelector('[class*="description"], [class*="content"], article, main')?.innerText?.slice(0, 2000)`
+3. Save to `DATA_DIR/jobs/[company-slug]-[date]/posting.md`
 
-If you can't resolve the direct link for a job, note the company name so the user can find it themselves. Never show hiring.cafe URLs to the user.
+For **Medium-fit** jobs: use the captured `href` if available; skip navigation.
+
+Never show hiring.cafe URLs to the user.
 
 ### Step 6: Auto-Apply to All High-Fit Jobs
 
