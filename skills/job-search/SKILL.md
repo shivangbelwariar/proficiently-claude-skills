@@ -188,7 +188,7 @@ The pipeline has two parts running simultaneously:
 
 **Apply pool — start after queue has ≥5 pending rows:**
 1. Open 5 tabs, navigate each to first 5 `pending` employer URLs, mark them `claimed` in queue
-2. Dispatch apply agent for each tab (`run_in_background: true`): Tab ID, Employer URL, Resume `/Users/gbelwariar/.proficiently/resume/Palak_SSE_Resume (1).pdf`, workflow per `skills/apply/SKILL.md` with `tab:<tabId>`
+2. Dispatch apply agent for each tab (`run_in_background: true`): Tab ID, Employer URL, Resume `~/.proficiently/resume/<your-resume.pdf> (read exact path from DATA_DIR/application-data.md → File Paths → Resume PDF)`, workflow per `skills/apply/SKILL.md` with `tab:<tabId>`
 
 **Sliding window loop:**
 - When any agent completes:

@@ -224,7 +224,7 @@ If the page shows a sign-in / login form (detected by `find("Sign in")`, `find("
 Also run `find("*")` and `find("Select One")` as backup catchers for radio buttons and Workday dropdowns the JS misses.
 
 **Resume: NEVER tailor. Always use the original resume as-is.**
-Resume is hardcoded at: `/Users/gbelwariar/.proficiently/resume/Palak_SSE_Resume (1).pdf` — use this path directly.
+Resume is hardcoded at: `~/.proficiently/resume/<your-resume.pdf> (read exact path from DATA_DIR/application-data.md → File Paths → Resume PDF)` — use this path directly.
 
 **Cover letter: only if `hasCoverLetter` was true.** Check if `DATA_DIR/jobs/[job-folder]/cover-letter.md` exists — if not, run the cover-letter skill inline and save it. Skip entirely if no cover letter field found.
 
@@ -291,7 +291,7 @@ The subagent fills all fields on the current page, then returns what was filled 
 6. Repeat until reaching the review page
 
 **File upload handling:**
-Resume path: `/Users/gbelwariar/.proficiently/resume/Palak_SSE_Resume (1).pdf`
+Resume path: `~/.proficiently/resume/<your-resume.pdf> (read exact path from DATA_DIR/application-data.md → File Paths → Resume PDF)`
 For resume/cover letter file uploads:
 1. Use chrome-devtools `upload_file` tool with `selector='input[type="file"]'` and the resume path
 2. If selector not found: click the upload button/label first, then retry `upload_file`
