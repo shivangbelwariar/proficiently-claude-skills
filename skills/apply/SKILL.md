@@ -345,12 +345,12 @@ Match form field labels (case-insensitive, fuzzy) to application data:
 | `first name` | Personal.FirstName → "Fnu" | form_input / type |
 | `last name` | Personal.LastName → "Palak" | form_input / type |
 | `full name` | Personal.FirstName + LastName → "Fnu Palak" | form_input / type |
-| `email` | Personal.Email → "REDACTED_EMAIL" | form_input / type |
-| `phone` | Personal.Phone → "+14084228901" | form_input / type |
-| `city`, `location`, `current location` | Personal.City → "San Jose" | form_input / type / combobox |
-| `state` | Personal.State → "California" | dropdown / type |
-| `zip`, `postal code` | Personal.PostalCode → "95132" | form_input / type |
-| `address` | Personal.Address → "1880 Tradan Dr" | form_input / type |
+| `email` | Personal.Email (from application-data.md) | form_input / type |
+| `phone` | Personal.Phone (from application-data.md) | form_input / type |
+| `city`, `location`, `current location` | Personal.City (from application-data.md) | form_input / type / combobox |
+| `state` | Personal.State (from application-data.md) | dropdown / type |
+| `zip`, `postal code` | Personal.PostalCode (from application-data.md) | form_input / type |
+| `address` | Personal.Address (from application-data.md) | form_input / type |
 | `country` | Personal.Country → "United States" | dropdown selection |
 | `linkedin` | Profiles.LinkedIn | form_input / type |
 | `github` | Profiles.GitHub → leave blank | skip if optional |
