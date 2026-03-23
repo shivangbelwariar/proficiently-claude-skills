@@ -150,9 +150,15 @@ Set up browser per `shared/references/browser-setup.md` (`tabs_context` → `tab
   4. If OTP or email verification is required, use Gmail MCP (`mcp__claude_ai_Gmail__gmail_search_messages` with query `"verification" OR "OTP" OR "confirm" OR "activate"`) to retrieve the code or link, then enter it
   5. Once signed in, continue to the application form
 
+**iCIMS, Jobvite, SmartRecruiters, Taleo, or any other ATS**:
+- Navigate to the posting and click "Apply" / "Apply Now" / "Apply for this Job"
+- Handle any auth gate automatically (see Auth Gate block below) — NEVER skip a job just because the ATS type is unfamiliar
+- Fill the form using `form_input` / `computer` clicks — treat it like Workday if multi-step
+
 **Unknown ATS**:
-- Navigate to the URL, take a screenshot
-- Attempt to identify the form. If unrecognizable, tell the user and ask for guidance.
+- Navigate to the URL, take a screenshot to understand the page
+- Attempt to fill it — try `read_page(filter="interactive")`, then `form_input` or `computer` clicks
+- Only ask the user if you hit a CAPTCHA or truly unresolvable blocker — do NOT skip just because the ATS is unfamiliar
 
 ### Step 3.5: Try Simplify Autofill First
 
