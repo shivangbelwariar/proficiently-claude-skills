@@ -172,8 +172,12 @@ Set up browser per `shared/references/browser-setup.md` (`tabs_context` → `tab
      - **School/University**: Simplify may fill wrong school — overwrite with "Rajasthan Technical University, Kota" (or "Other" if dropdown)
      - **Field of Study**: must be "Computer Engineering" exactly
      - **Graduation Year**: must be 2019
-     - Any field that looks blank or wrong compared to `application-data.md`
-   - After correction, skip to **Step 7** (submit) — no need to manually fill every field
+   - **Then do a mandatory full required-field verification scan:**
+     - Use `find("Select One")` to catch any unfilled dropdowns
+     - Use `find("Required")` to find blank required fields
+     - Scroll top-to-bottom checking every required (*) field has a real value
+     - Fill any still-empty required fields using `application-data.md` before proceeding
+   - Skip to **Step 7**, passing `simplify_already_filled: true` to the fill-page subagent
 4. **If no Simplify icon appears after 3 seconds:**
    - Simplify doesn't support this form — continue with manual Steps 5-7 below
 
@@ -219,7 +223,7 @@ Before filling anything, scan the entire form to discover every field. Do NOT fi
 - Whether it's required
 - The element ref for later filling
 
-### Step 6: Propose Answers and Get Approval
+### Step 6: Auto-Fill All Fields (No Approval Needed)
 
 Generate a proposed answer for every field using this priority:
 1. **Application data** — match from `application-data.md` per the Field Matching Reference below
@@ -250,6 +254,7 @@ After approval, fill everything in one pass.
 - The approved field→value mapping (all answers, not just application data)
 - Tab ID
 - File paths for resume and cover letter uploads
+- `simplify_already_filled: true` if Simplify was used in Step 3.5 (so subagent verifies instead of re-filling)
 
 The subagent fills all fields on the current page, then returns what was filled and what remains.
 
@@ -343,9 +348,13 @@ Match form field labels (case-insensitive, fuzzy) to application data:
 | `degree`, `education level` | Education.Degree → "Bachelor's" | dropdown / type |
 | `field of study`, `major` | Education.FieldOfStudy → "Computer Engineering" | form_input / type |
 | `graduation year`, `grad year` | Education.GraduationYear → "2019" | form_input / dropdown |
-| `current company`, `employer` | WorkExperience.CurrentCompany → "RAJNISH" | form_input / type |
-| `current title`, `job title` | WorkExperience.CurrentTitle → "Senior Software Engineer" | form_input / type |
-| `years of experience` | WorkExperience.YearsOfExperience → "5" | form_input / dropdown |
+| `current company`, `employer`, `current employer` | Work Experience — Job 1 (Current) → Company → "RAJNISH" | form_input / type |
+| `current title`, `job title`, `current position` | Work Experience — Job 1 (Current) → Title → "Senior Software Engineer" | form_input / type |
+| `previous company`, `prior employer`, `previous employer`, `former employer` | Work Experience — Job 2 (Previous) → Company → "Robert Bosch Venture Capital" (also "Bosch") | form_input / type |
+| `previous title`, `prior role`, `previous position` | Work Experience — Job 2 (Previous) → Title → "Senior Software Engineer" | form_input / type |
+| `previous start date` | Work Experience — Job 2 (Previous) → Start → "September 2019" | form_input / type |
+| `previous end date` | Work Experience — Job 2 (Previous) → End → "June 2023" | form_input / type |
+| `years of experience` | Overall Experience → Total Years → "6" | form_input / dropdown |
 | `salary`, `compensation`, `expected salary` | CustomAnswers.SalaryExpectation → "$130,000 - $160,000" | form_input / type |
 | `start date`, `availability`, `notice period` | CustomAnswers.StartDate → "2 weeks" | form_input / type |
 | `onsite`, `in-person`, `hybrid`, `in-office` | CustomAnswers.Onsite → "Yes" | radio/dropdown |
