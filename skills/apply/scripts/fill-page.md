@@ -116,14 +116,14 @@ Fill and verify in ONE pass — no separate verification scroll:
 
 ## File Upload Fields
 
-Resume is always at: `~/.proficiently/resume/<your-resume.pdf> (read exact path from DATA_DIR/application-data.md → File Paths → Resume PDF)`
+Resume is always at: `/Users/gbelwariar/.proficiently/resume/Palak_SSE_Resume (1).pdf`
 
 For resume/cover letter PDF/DOCX uploads:
 1. Use the chrome-devtools `upload_file` tool — this directly injects the file into the input element without any CORS workarounds:
    ```
    mcp__plugin_chrome-devtools-mcp_chrome-devtools__upload_file(
      pageId=<pageId>, selector='input[type="file"]',
-     filePath='~/.proficiently/resume/<your-resume.pdf> (read exact path from DATA_DIR/application-data.md → File Paths → Resume PDF)'
+     filePath='/Users/gbelwariar/.proficiently/resume/Palak_SSE_Resume (1).pdf'
    )
    ```
 2. If the selector `input[type="file"]` is not found: use `find()` to locate the upload button/label, click it to reveal the input, then retry `upload_file`

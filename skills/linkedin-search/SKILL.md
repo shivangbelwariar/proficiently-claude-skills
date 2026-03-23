@@ -143,7 +143,7 @@ Build a queue of all High-fit jobs with resolved employer URLs, sorted by fit sc
 
 **Initialize:**
 1. Open a tab and dispatch an apply agent (background) for each of the first 5 jobs in the queue
-2. Each agent receives: Tab ID, Employer URL, Resume path `~/.proficiently/resume/<your-resume.pdf> (read exact path from DATA_DIR/application-data.md → File Paths → Resume PDF)`, and apply workflow per `skills/apply/SKILL.md` with argument `tab:<tabId>`
+2. Each agent receives: Tab ID, Employer URL, Resume path `/Users/gbelwariar/.proficiently/resume/Palak_SSE_Resume (1).pdf`, and apply workflow per `skills/apply/SKILL.md` with argument `tab:<tabId>`
 3. Use `run_in_background: true` so you are notified when each finishes independently
 
 **Loop until queue empty AND all slots idle:**
