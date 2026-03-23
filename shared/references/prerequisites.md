@@ -12,6 +12,12 @@ Check that required data files exist before proceeding. If any required file is 
 | `DATA_DIR/linkedin-contacts.csv` | — | — | — | — | Required | — |
 | `DATA_DIR/application-data.md` | — | — | — | — | — | Created if missing |
 
+## Python Dependencies (linkedin-search only)
+
+| Package | Install | Notes |
+|---------|---------|-------|
+| `python-jobspy` | Auto-installed by `jobspy_search.py` on first run | Scrapes LinkedIn without login |
+
 ## Failure Messages
 
 - **Resume missing**: Hard stop only. Log "resume missing" and skip to next job if in a loop.
