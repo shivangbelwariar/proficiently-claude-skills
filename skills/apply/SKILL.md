@@ -11,17 +11,10 @@ argument-hint: "job URL, 'last' to use most recent job, or 'current' to fill the
 You MUST ONLY use data explicitly stored in `DATA_DIR/application-data.md`.
 If a field asks for information not in application-data.md:
 - Dropdown → select "Other", "Prefer not to say", "N/A", or the most neutral option
-- Text field (short) → type "N/A" or leave blank if optional
-- Text area / essay / behavioral question → leave blank if optional; type "N/A" if required
-- NEVER invent, guess, or fabricate ANY information, including but not limited to:
-  - Personal facts: school names, company names, dates, addresses, phone numbers, URLs, GPA, salary history
-  - **Work stories, incidents, or experiences** that are not explicitly written in application-data.md
-  - **Behavioral or narrative answers** (e.g. "describe a challenge", "tell us about a time you...", "what's your greatest achievement")
-  - Any content that would only be known by the real applicant
-
-**If a text area or essay field has no pre-approved answer in application-data.md → leave it blank or type "N/A". Do NOT write any story, example, or fabricated narrative. This applies even if the field is required.**
-
-This rule has NO exceptions. Writing fabricated work stories causes fraudulent applications and real damage to the applicant.
+- Text field → type "N/A" or leave blank if optional
+- NEVER invent, guess, or fabricate ANY personal information including but not limited to:
+  school names, company names, dates, addresses, phone numbers, URLs, GPA, salary history
+This rule has NO exceptions. Violating it causes real damage to the applicant.
 
 ### SCHOOL FIELD HARD RULE
 The only acceptable school value is **"Rajasthan Technical University, Kota"** (stored in application-data.md).
@@ -246,12 +239,11 @@ Generate an answer for each required field using this priority:
 3. **Custom Answers** — check the "Custom Answers" section of `application-data.md` for previously cached answers
 4. **Safe fallback for unknown fields** — if the field is NOT in application-data.md and has no reasonable default:
    - Dropdown: select "Other" or the closest neutral option — **NEVER invent a value not in the data**
-   - Short text field: leave blank if optional; type "N/A" if required
-   - Text area / essay / behavioral question: leave blank if optional; type "N/A" if required — **NEVER write a fabricated work story or narrative**
+   - Text field: leave blank if optional; if required, use the most conservative/neutral answer
    - **NEVER fabricate personal facts** (school names, company names, dates, numbers, locations) that are not explicitly stored in application-data.md
    - School/University fields: ONLY use `Education.University` from application-data.md ("Rajasthan Technical University") — never guess another school
 
-**Auto-fill immediately without user approval.** Only use values that exist in application-data.md or the approved defaults above. Proceed directly to Step 7.
+**Auto-fill immediately without user approval.** Do not present a summary or ask for review. Generate the best answer for every field and proceed directly to Step 7 to fill the form.
 
 Cache any new field answers in `DATA_DIR/application-data.md` under a "Custom Answers" section so they're reused on future applications.
 
