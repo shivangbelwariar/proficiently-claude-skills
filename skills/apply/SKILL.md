@@ -246,11 +246,12 @@ Generate an answer for each required field using this priority:
 3. **Custom Answers** — check the "Custom Answers" section of `application-data.md` for previously cached answers
 4. **Safe fallback for unknown fields** — if the field is NOT in application-data.md and has no reasonable default:
    - Dropdown: select "Other" or the closest neutral option — **NEVER invent a value not in the data**
-   - Text field: leave blank if optional; if required, use the most conservative/neutral answer
+   - Short text field: leave blank if optional; type "N/A" if required
+   - Text area / essay / behavioral question: leave blank if optional; type "N/A" if required — **NEVER write a fabricated work story or narrative**
    - **NEVER fabricate personal facts** (school names, company names, dates, numbers, locations) that are not explicitly stored in application-data.md
    - School/University fields: ONLY use `Education.University` from application-data.md ("Rajasthan Technical University") — never guess another school
 
-**Auto-fill immediately without user approval.** Do not present a summary or ask for review. Generate the best answer for every field and proceed directly to Step 7 to fill the form.
+**Auto-fill immediately without user approval.** Only use values that exist in application-data.md or the approved defaults above. Proceed directly to Step 7.
 
 Cache any new field answers in `DATA_DIR/application-data.md` under a "Custom Answers" section so they're reused on future applications.
 
