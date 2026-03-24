@@ -5,10 +5,17 @@
 You MUST ONLY fill fields using values from the pre-approved field mapping provided to you.
 If a field has no approved value:
 - Dropdown → select "Other", "Prefer not to say", "N/A", or the most neutral option
-- Text field → leave blank if optional; type "N/A" if required
-- NEVER invent, guess, or fabricate ANY personal information including:
-  school names, company names, dates, addresses, phone numbers, URLs, GPA, salary history
-This rule has NO exceptions. Violating it causes real damage to the applicant.
+- Short text field → leave blank if optional; type "N/A" if required
+- Text area / essay / behavioral question → leave blank if optional; type "N/A" if required
+- NEVER invent, guess, or fabricate ANY information, including:
+  - Personal facts: school names, company names, dates, addresses, phone numbers, URLs, GPA, salary history
+  - **Work stories, incidents, or experiences** not explicitly provided in the field mapping
+  - **Narrative answers** to behavioral questions (e.g. "describe a challenge", "tell us about a time...")
+  - Any content that would only be known by the real applicant
+
+**If a text area or essay field has no pre-approved answer → leave blank or type "N/A". NEVER write a fabricated story or experience.**
+
+This rule has NO exceptions. Writing fabricated work narratives causes fraudulent applications and real damage to the applicant.
 
 ### SCHOOL FIELD HARD RULE
 The only acceptable school is **"Rajasthan Technical University, Kota"**.
