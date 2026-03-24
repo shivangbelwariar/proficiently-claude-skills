@@ -135,25 +135,16 @@ For each High-fit job:
 
 For **Medium-fit** jobs: attempt to resolve employer URL but don't save full posting.
 
-### Step 6: Auto-Apply to All High-Fit Jobs (sliding window, always 3 active)
+### Step 6: Auto-Apply to All High-Fit Jobs
 
 **Do this automatically without asking the user. Do NOT present results first and wait — start applying immediately.**
 
-Build a queue of all High-fit jobs with resolved employer URLs, sorted by fit score. Use a sliding window pool of 5 — as soon as any slot finishes, immediately fill it with the next job. Never wait for all 5 to finish before starting another.
+For each High-fit job with a resolved employer URL:
 
-**Initialize:**
-1. Open a tab and dispatch an apply agent (background) for each of the first 5 jobs in the queue
-2. Each agent receives: Tab ID, Employer URL, Resume path `/Users/gbelwariar/.proficiently/resume/Palak_SSE_Resume (1).pdf`, and apply workflow per `skills/apply/SKILL.md` with argument `tab:<tabId>`
-3. Use `run_in_background: true` so you are notified when each finishes independently
-
-**Loop until queue empty AND all slots idle:**
-- When notified any agent completes:
-  1. Log its result immediately to `DATA_DIR/job-history.md`
-  2. If the queue has more jobs: **navigate the same tab** (same tabId) to the next employer URL using `navigate(tabId, url)`, then dispatch the next apply agent with that same tabId (`run_in_background: true`) — do NOT create a new tab
-  3. If queue is empty: that slot goes idle — wait for remaining active slots to finish
-- If a tab fails/crashes: log it as `apply-failed`, free the slot, reuse or pull next from queue
-
-The 5 tabs opened at initialization are reused for the entire session — tab count never exceeds 5.
+1. Use the original resume from `DATA_DIR/resume/` as-is — never tailor
+2. Run the apply workflow per `skills/apply/SKILL.md` — fill and auto-submit. Do not pause for approval or confirmation between jobs.
+3. Log result to `DATA_DIR/job-history.md`
+4. Move immediately to the next job
 
 After all High-fit jobs are processed, loop back to Step 1 with different search keywords from `preferences.md`. Keep running continuously — never stop unless there are zero new results and all queues are empty.
 
